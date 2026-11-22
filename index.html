@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Günlük Takip">
-  <meta name="theme-color" content="#F5F5F7">
+  <meta name="theme-color" id="meta-theme-color" content="#F5F5F7">
 
   <!-- Inter Font (Only 300, 400, 500) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,6 +18,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
+      darkMode: 'class',
       theme: {
         extend: {
           fontFamily: {
@@ -39,8 +40,11 @@
   <style>
     html {
       height: 100%;
-      /* Top half matches page bg (#F5F5F7), bottom half matches nav bar (#141824) so iOS home-indicator area never shows white */
       background: linear-gradient(to bottom, #F5F5F7 50%, #141824 50%);
+      background-color: #141824;
+    }
+    html.dark {
+      background: linear-gradient(to bottom, #0B0D14 50%, #141824 50%);
       background-color: #141824;
     }
     body {
@@ -55,10 +59,13 @@
       background-color: #F5F5F7;
       color: #1D1D1F;
     }
+    html.dark body {
+      background-color: #0B0D14;
+      color: #F3F4F6;
+    }
     .tabular-nums {
       font-variant-numeric: tabular-nums;
     }
-    /* Hide scrollbars for clean UI */
     .no-scrollbar::-webkit-scrollbar {
       display: none;
     }
@@ -66,7 +73,6 @@
       -ms-overflow-style: none;
       scrollbar-width: none;
     }
-    /* iPhone 15 PWA bottom white gap fix */
     .bottom-nav-fix {
       padding-bottom: calc(env(safe-area-inset-bottom, 20px) + 10px);
     }
@@ -82,53 +88,73 @@
     }
   </style>
 </head>
-<body class="h-full flex flex-col antialiased bg-[#F5F5F7] text-[#1D1D1F] font-normal">
+<body class="h-full flex flex-col antialiased bg-[#F5F5F7] dark:bg-[#0B0D14] text-[#1D1D1F] dark:text-[#F3F4F6] font-normal transition-colors duration-200">
 
-  <!-- Main Scrollable App Container -->
-  <main id="app-container" class="flex-1 overflow-y-auto no-scrollbar w-full max-w-lg mx-auto px-4 pt-[calc(env(safe-area-inset-top)+16px)] pb-[calc(env(safe-area-inset-bottom)+110px)]">
+  <!-- Main Scrollable App Container (extra top padding to stay clear of Dynamic Island) -->
+  <main id="app-container" class="flex-1 overflow-y-auto no-scrollbar w-full max-w-lg mx-auto px-4 pt-[calc(env(safe-area-inset-top)+28px)] pb-[calc(env(safe-area-inset-bottom)+110px)]">
 
     <!-- Header (Non-sticky, scrolls smoothly with entire page) -->
     <header class="flex items-center justify-between mb-5">
       <div>
-        <h1 id="header-greeting" class="text-2xl font-medium tracking-tight text-[#1D1D1F]">İyi akşamlar, Burak</h1>
+        <h1 id="header-greeting" class="text-2xl font-medium tracking-tight text-[#1D1D1F] dark:text-[#F3F4F6]">İyi akşamlar, Burak</h1>
         <p id="header-date" class="text-xs font-normal text-[#8E8E93] mt-0.5 tabular-nums">22 Kasım 2026 Pazar</p>
       </div>
-      <button onclick="openSettingsModal()" class="w-10 h-10 rounded-full bg-[#E5E5EA]/60 active:bg-[#D1D1D6] flex items-center justify-center transition-colors text-[#545456]" aria-label="Ayarlar">
-        <!-- Minimalist Gear Icon -->
-        <svg class="w-5 h-5 stroke-current fill-none stroke-[1.8]" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
-          <circle cx="12" cy="12" r="3"/>
-        </svg>
-      </button>
-    </header>
+      <div class="flex items-center gap-2">
+        <!-- Dark Mode Toggle -->
+        <button onclick="toggleDarkMode()" id="header-theme-btn" class="w-10 h-10 rounded-full bg-[#E5E5EA]/60 dark:bg-[#1C202E] active:bg-[#D1D1D6] dark:active:bg-[#2A3042] flex items-center justify-center transition-colors text-[#545456] dark:text-[#D1D5DB]" aria-label="Tema Değiştir">
+          <!-- Moon Icon (shown in light mode) -->
+          <svg id="icon-moon" class="w-5 h-5 stroke-current fill-none stroke-[1.8]" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+          <!-- Sun Icon (shown in dark mode) -->
+          <svg id="icon-sun" class="w-5 h-5 stroke-current fill-none stroke-[1.8] hidden" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/>
+            <line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+        </button>
 
-    <!-- Dynamic Tab Content Views -->
+        <!-- Settings Button -->
+        <button onclick="openSettingsModal()" class="w-10 h-10 rounded-full bg-[#E5E5EA]/60 dark:bg-[#1C202E] active:bg-[#D1D1D6] dark:active:bg-[#2A3042] flex items-center justify-center transition-colors text-[#545456] dark:text-[#D1D5DB]" aria-label="Ayarlar">
+          <svg class="w-5 h-5 stroke-current fill-none stroke-[1.8]" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </button>
+      </div>
+    </header>
 
     <!-- TAB 1: ANA SAYFA (Dashboard) -->
     <div id="tab-dashboard" class="tab-content space-y-4">
       
       <!-- Top Scores Section -->
       <div class="grid grid-cols-2 gap-3">
-        <!-- Görev Puanı Card (Pure White) -->
-        <div class="bg-white rounded-2xl p-4 shadow-sm border border-black/[0.03] flex flex-col justify-between">
+        <!-- Görev Puanı Card -->
+        <div class="bg-white dark:bg-[#161923] rounded-2xl p-4 shadow-sm border border-black/[0.03] dark:border-white/[0.06] flex flex-col justify-between">
           <div class="flex items-center justify-between">
             <span class="text-xs font-normal text-[#8E8E93]">Görev Puanı</span>
             <svg class="w-4 h-4 text-[#F25C19]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           </div>
           <div class="mt-3 flex items-baseline justify-between">
-            <span id="dash-task-score" class="text-2xl font-medium tabular-nums text-[#1D1D1F]">0%</span>
+            <span id="dash-task-score" class="text-2xl font-medium tabular-nums text-[#1D1D1F] dark:text-[#F3F4F6]">0%</span>
             <span id="dash-task-count" class="text-[11px] font-normal text-[#8E8E93] tabular-nums">0/0</span>
           </div>
         </div>
 
-        <!-- Gün & Moral Puanı Card (Pure White) -->
-        <div class="bg-white rounded-2xl p-4 shadow-sm border border-black/[0.03] flex flex-col justify-between">
+        <!-- Gün & Moral Puanı Card -->
+        <div class="bg-white dark:bg-[#161923] rounded-2xl p-4 shadow-sm border border-black/[0.03] dark:border-white/[0.06] flex flex-col justify-between">
           <div class="flex items-center justify-between">
             <span class="text-xs font-normal text-[#8E8E93]">Gün & Moral</span>
             <svg class="w-4 h-4 text-[#5E5CE6]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           </div>
           <div class="mt-3 flex items-baseline justify-between">
-            <span id="dash-mood-score" class="text-2xl font-medium tabular-nums text-[#1D1D1F]">-</span>
+            <span id="dash-mood-score" class="text-2xl font-medium tabular-nums text-[#1D1D1F] dark:text-[#F3F4F6]">-</span>
             <span class="text-[11px] font-normal text-[#8E8E93] tabular-nums">10 Üzerinden</span>
           </div>
         </div>
@@ -149,9 +175,9 @@
       </div>
 
       <!-- Haftalık Performans (Son 7 Gün) -->
-      <div class="bg-white rounded-2xl p-4 shadow-sm border border-black/[0.03]">
+      <div class="bg-white dark:bg-[#161923] rounded-2xl p-4 shadow-sm border border-black/[0.03] dark:border-white/[0.06]">
         <div class="flex items-center justify-between mb-4">
-          <h2 class="text-xs font-normal text-[#1D1D1F]">Haftalık Performans</h2>
+          <h2 class="text-xs font-normal text-[#1D1D1F] dark:text-[#F3F4F6]">Haftalık Performans</h2>
           <span class="text-[11px] font-normal text-[#8E8E93]">Son 7 Gün</span>
         </div>
         <div id="weekly-bars-container" class="grid grid-cols-7 gap-2 items-end h-28 pt-2">
@@ -159,43 +185,58 @@
         </div>
       </div>
 
-      <!-- Günlük Görevler Container (Ice Blue #EEF4FF) -->
-      <div class="bg-[#EEF4FF] rounded-2xl p-4 border border-[#D0E2FF]/40 space-y-3">
+      <!-- Günlük Görevler Container (Includes Habits + Daily Tasks) -->
+      <div class="bg-[#EEF4FF] dark:bg-[#131929] rounded-2xl p-4 border border-[#D0E2FF]/40 dark:border-white/[0.06] space-y-3">
         <div class="flex items-center justify-between">
           <div>
-            <h2 class="text-sm font-medium text-[#1D1D1F]">Günlük Görevler</h2>
-            <p class="text-[11px] font-normal text-[#6E6E73]">Planlanan işler ve hatırlatıcılar</p>
+            <h2 class="text-sm font-medium text-[#1D1D1F] dark:text-[#F3F4F6]">Günlük Görevler</h2>
+            <p class="text-[11px] font-normal text-[#6E6E73] dark:text-[#9CA3AF]">Alışkanlıklar, planlanan işler ve hatırlatıcılar</p>
           </div>
-          <button onclick="openAddTaskModal()" class="px-3 py-1.5 rounded-xl bg-[#141824] active:bg-[#2C3246] text-white text-xs font-normal flex items-center gap-1.5 transition-colors shadow-sm">
+          <button onclick="openAddTaskModal()" class="px-3 py-1.5 rounded-xl bg-[#141824] dark:bg-[#F25C19] active:bg-[#2C3246] text-white text-xs font-normal flex items-center gap-1.5 transition-colors shadow-sm">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>
             <span>Ekle</span>
           </button>
         </div>
 
         <div id="tasks-list" class="space-y-2">
-          <!-- Tasks list rendered dynamically -->
+          <!-- Habits + Manual Tasks rendered dynamically -->
         </div>
       </div>
 
-      <!-- Gün Sonu Değerlendirme (Mood & Rating) -->
-      <div class="bg-white rounded-2xl p-4 shadow-sm border border-black/[0.03] space-y-4">
-        <div>
-          <h2 class="text-sm font-medium text-[#1D1D1F]">Gün Sonu Değerlendirme</h2>
-          <p class="text-[11px] font-normal text-[#8E8E93]">Bugünkü modunu ve notunu kaydet</p>
+      <!-- Yaklaşan Hedefler (Dashboard Goals Summary) -->
+      <div id="dash-goals-section" class="bg-white dark:bg-[#161923] rounded-2xl p-4 shadow-sm border border-black/[0.03] dark:border-white/[0.06] space-y-3">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-sm font-medium text-[#1D1D1F] dark:text-[#F3F4F6]">Hedeflerim</h2>
+            <p class="text-[11px] font-normal text-[#8E8E93]">Yaklaşan hedefler ve kalan süre</p>
+          </div>
+          <button onclick="switchTab('goals')" class="text-[11px] font-normal text-[#F25C19]">Tümünü Gör</button>
+        </div>
+        <div id="dash-goals-list" class="space-y-2">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+
+      <!-- Gün Sonu Değerlendirme (Always at bottom of Dashboard) -->
+      <div class="bg-white dark:bg-[#161923] rounded-2xl p-4 shadow-sm border border-black/[0.03] dark:border-white/[0.06] space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-sm font-medium text-[#1D1D1F] dark:text-[#F3F4F6]">Gün Sonu Değerlendirme</h2>
+            <p class="text-[11px] font-normal text-[#8E8E93]">Bugünkü modunu ve notunu kaydet</p>
+          </div>
+          <span class="text-[10px] text-[#8E8E93] tabular-nums">Her gün 23:30</span>
         </div>
 
         <!-- 5 Vector SVG Mood Faces -->
         <div class="grid grid-cols-5 gap-2" id="mood-selector">
-          <!-- Mood 1: Red Very Sad / X Eyes -->
-          <button onclick="selectMood(1)" data-mood="1" class="mood-btn flex flex-col items-center p-2 rounded-xl border border-transparent hover:bg-gray-50 transition-all">
+          <button onclick="selectMood(1)" data-mood="1" class="mood-btn flex flex-col items-center p-2 rounded-xl border border-transparent hover:bg-gray-50 dark:hover:bg-white/5 transition-all">
             <svg class="w-8 h-8 text-[#FF3B30]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
               <circle cx="12" cy="12" r="10" fill="#FF3B30" fill-opacity="0.12"/>
               <path d="M8 9l2 2m0-2l-2 2M14 9l2 2m0-2l-2 2M16 16c-1.5-1.5-4-1.5-8 0" stroke-linecap="round"/>
             </svg>
             <span class="text-[10px] text-[#8E8E93] mt-1">Kötü</span>
           </button>
-          <!-- Mood 2: Orange Sad -->
-          <button onclick="selectMood(2)" data-mood="2" class="mood-btn flex flex-col items-center p-2 rounded-xl border border-transparent hover:bg-gray-50 transition-all">
+          <button onclick="selectMood(2)" data-mood="2" class="mood-btn flex flex-col items-center p-2 rounded-xl border border-transparent hover:bg-gray-50 dark:hover:bg-white/5 transition-all">
             <svg class="w-8 h-8 text-[#FF9500]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
               <circle cx="12" cy="12" r="10" fill="#FF9500" fill-opacity="0.12"/>
               <circle cx="9" cy="10" r="1" fill="currentColor"/>
@@ -204,8 +245,7 @@
             </svg>
             <span class="text-[10px] text-[#8E8E93] mt-1">Düşük</span>
           </button>
-          <!-- Mood 3: Yellow Neutral -->
-          <button onclick="selectMood(3)" data-mood="3" class="mood-btn flex flex-col items-center p-2 rounded-xl border border-transparent hover:bg-gray-50 transition-all">
+          <button onclick="selectMood(3)" data-mood="3" class="mood-btn flex flex-col items-center p-2 rounded-xl border border-transparent hover:bg-gray-50 dark:hover:bg-white/5 transition-all">
             <svg class="w-8 h-8 text-[#FFCC00]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
               <circle cx="12" cy="12" r="10" fill="#FFCC00" fill-opacity="0.15"/>
               <circle cx="9" cy="10" r="1" fill="currentColor"/>
@@ -214,8 +254,7 @@
             </svg>
             <span class="text-[10px] text-[#8E8E93] mt-1">Normal</span>
           </button>
-          <!-- Mood 4: Light Green Smile -->
-          <button onclick="selectMood(4)" data-mood="4" class="mood-btn flex flex-col items-center p-2 rounded-xl border border-transparent hover:bg-gray-50 transition-all">
+          <button onclick="selectMood(4)" data-mood="4" class="mood-btn flex flex-col items-center p-2 rounded-xl border border-transparent hover:bg-gray-50 dark:hover:bg-white/5 transition-all">
             <svg class="w-8 h-8 text-[#34C759]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
               <circle cx="12" cy="12" r="10" fill="#34C759" fill-opacity="0.12"/>
               <circle cx="9" cy="10" r="1" fill="currentColor"/>
@@ -224,8 +263,7 @@
             </svg>
             <span class="text-[10px] text-[#8E8E93] mt-1">İyi</span>
           </button>
-          <!-- Mood 5: Green Big Smile -->
-          <button onclick="selectMood(5)" data-mood="5" class="mood-btn flex flex-col items-center p-2 rounded-xl border border-transparent hover:bg-gray-50 transition-all">
+          <button onclick="selectMood(5)" data-mood="5" class="mood-btn flex flex-col items-center p-2 rounded-xl border border-transparent hover:bg-gray-50 dark:hover:bg-white/5 transition-all">
             <svg class="w-8 h-8 text-[#30B0C7]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
               <circle cx="12" cy="12" r="10" fill="#30B0C7" fill-opacity="0.15"/>
               <circle cx="9" cy="9.5" r="1" fill="currentColor"/>
@@ -248,10 +286,10 @@
         <!-- Note Input -->
         <div>
           <label class="text-xs font-normal text-[#8E8E93] block mb-1.5">Günün Notu</label>
-          <textarea id="daily-note" rows="2" placeholder="Bugün neler yaşandı, ne hissediyorsun?" class="w-full text-xs p-3 rounded-xl bg-[#F5F5F7] border border-black/[0.04] focus:outline-none focus:ring-1 focus:ring-[#141824] transition-all resize-none"></textarea>
+          <textarea id="daily-note" rows="2" placeholder="Bugün neler yaşandı, ne hissediyorsun?" class="w-full text-xs p-3 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[#1D1D1F] dark:text-[#F3F4F6] border border-black/[0.04] dark:border-white/[0.08] focus:outline-none focus:ring-1 focus:ring-[#141824] dark:focus:ring-white/30 transition-all resize-none"></textarea>
         </div>
 
-        <button onclick="saveDailyEvaluation()" class="w-full py-2.5 rounded-xl bg-[#141824] active:bg-[#2C3246] text-white text-xs font-medium transition-colors shadow-sm">
+        <button onclick="saveDailyEvaluation()" class="w-full py-2.5 rounded-xl bg-[#141824] dark:bg-[#F25C19] active:bg-[#2C3246] text-white text-xs font-medium transition-colors shadow-sm">
           Kaydet
         </button>
       </div>
@@ -262,10 +300,10 @@
     <div id="tab-habits" class="tab-content hidden space-y-4">
       <div class="flex items-center justify-between mb-2">
         <div>
-          <h2 class="text-lg font-medium text-[#1D1D1F]">Alışkanlıklar</h2>
+          <h2 class="text-lg font-medium text-[#1D1D1F] dark:text-[#F3F4F6]">Alışkanlıklar</h2>
           <p class="text-xs font-normal text-[#8E8E93]">Düzenli aktiviteler ve mini ısı haritaları</p>
         </div>
-        <button onclick="openAddHabitModal()" class="px-3 py-1.5 rounded-xl bg-[#141824] active:bg-[#2C3246] text-white text-xs font-normal flex items-center gap-1.5 transition-colors shadow-sm">
+        <button onclick="openAddHabitModal()" class="px-3 py-1.5 rounded-xl bg-[#141824] dark:bg-[#F25C19] active:bg-[#2C3246] text-white text-xs font-normal flex items-center gap-1.5 transition-colors shadow-sm">
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>
           <span>Yeni</span>
         </button>
@@ -280,23 +318,23 @@
     <!-- TAB 3: ANALİZ -->
     <div id="tab-analysis" class="tab-content hidden space-y-4">
       <div>
-        <h2 class="text-lg font-medium text-[#1D1D1F]">Analiz</h2>
+        <h2 class="text-lg font-medium text-[#1D1D1F] dark:text-[#F3F4F6]">Analiz</h2>
         <p class="text-xs font-normal text-[#8E8E93]">Son 84 günlük detaylı performans takibi</p>
       </div>
 
       <!-- Selected Day Summary Card -->
-      <div id="analysis-detail-card" class="bg-white rounded-2xl p-4 shadow-sm border border-black/[0.03] space-y-2">
+      <div id="analysis-detail-card" class="bg-white dark:bg-[#161923] rounded-2xl p-4 shadow-sm border border-black/[0.03] dark:border-white/[0.06] space-y-2">
         <div class="flex items-center justify-between">
-          <span id="analysis-detail-date" class="text-xs font-medium text-[#1D1D1F]">Bir gün seçin</span>
+          <span id="analysis-detail-date" class="text-xs font-medium text-[#1D1D1F] dark:text-[#F3F4F6]">Bir gün seçin</span>
           <span id="analysis-detail-score" class="text-xs font-medium text-[#F25C19] tabular-nums">-</span>
         </div>
-        <p id="analysis-detail-note" class="text-xs text-[#6E6E73] italic">Isı haritasındaki herhangi bir güne tıklayarak detayları görüntüleyebilirsiniz.</p>
+        <p id="analysis-detail-note" class="text-xs text-[#6E6E73] dark:text-[#9CA3AF] italic">Isı haritasındaki herhangi bir güne tıklayarak detayları görüntüleyebilirsiniz.</p>
       </div>
 
       <!-- 84-Day Task Score Heatmap (Orange) -->
-      <div class="bg-white rounded-2xl p-4 shadow-sm border border-black/[0.03] space-y-3">
+      <div class="bg-white dark:bg-[#161923] rounded-2xl p-4 shadow-sm border border-black/[0.03] dark:border-white/[0.06] space-y-3">
         <div class="flex items-center justify-between">
-          <span class="text-xs font-normal text-[#1D1D1F]">Görev Puanı (84 Gün)</span>
+          <span class="text-xs font-normal text-[#1D1D1F] dark:text-[#F3F4F6]">Görev Puanı (84 Gün)</span>
           <span class="text-[10px] text-[#8E8E93]">Turuncu Isı Haritası</span>
         </div>
         <div id="heatmap-task" class="grid grid-cols-12 gap-1.5">
@@ -305,9 +343,9 @@
       </div>
 
       <!-- 84-Day Mood Score Heatmap (Indigo) -->
-      <div class="bg-white rounded-2xl p-4 shadow-sm border border-black/[0.03] space-y-3">
+      <div class="bg-white dark:bg-[#161923] rounded-2xl p-4 shadow-sm border border-black/[0.03] dark:border-white/[0.06] space-y-3">
         <div class="flex items-center justify-between">
-          <span class="text-xs font-normal text-[#1D1D1F]">Gün & Moral Puanı (84 Gün)</span>
+          <span class="text-xs font-normal text-[#1D1D1F] dark:text-[#F3F4F6]">Gün & Moral Puanı (84 Gün)</span>
           <span class="text-[10px] text-[#8E8E93]">İndigo Isı Haritası</span>
         </div>
         <div id="heatmap-mood" class="grid grid-cols-12 gap-1.5">
@@ -316,9 +354,9 @@
       </div>
 
       <!-- 84-Day Combined Score Heatmap (Emerald) -->
-      <div class="bg-white rounded-2xl p-4 shadow-sm border border-black/[0.03] space-y-3">
+      <div class="bg-white dark:bg-[#161923] rounded-2xl p-4 shadow-sm border border-black/[0.03] dark:border-white/[0.06] space-y-3">
         <div class="flex items-center justify-between">
-          <span class="text-xs font-normal text-[#1D1D1F]">Birleşik Skor (84 Gün)</span>
+          <span class="text-xs font-normal text-[#1D1D1F] dark:text-[#F3F4F6]">Birleşik Skor (84 Gün)</span>
           <span class="text-[10px] text-[#8E8E93]">Zümrüt Isı Haritası</span>
         </div>
         <div id="heatmap-combined" class="grid grid-cols-12 gap-1.5">
@@ -331,10 +369,10 @@
     <div id="tab-goals" class="tab-content hidden space-y-4">
       <div class="flex items-center justify-between mb-2">
         <div>
-          <h2 class="text-lg font-medium text-[#1D1D1F]">Hedefler</h2>
+          <h2 class="text-lg font-medium text-[#1D1D1F] dark:text-[#F3F4F6]">Hedefler</h2>
           <p class="text-xs font-normal text-[#8E8E93]">Uzun vadeli vizyon ve aşamalar</p>
         </div>
-        <button onclick="openAddGoalModal()" class="px-3 py-1.5 rounded-xl bg-[#141824] active:bg-[#2C3246] text-white text-xs font-normal flex items-center gap-1.5 transition-colors shadow-sm">
+        <button onclick="openAddGoalModal()" class="px-3 py-1.5 rounded-xl bg-[#141824] dark:bg-[#F25C19] active:bg-[#2C3246] text-white text-xs font-normal flex items-center gap-1.5 transition-colors shadow-sm">
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>
           <span>Hedef Ekle</span>
         </button>
@@ -350,8 +388,6 @@
   <!-- FULL-BOTTOM FLUSH & PROPORTIONED BOTTOM NAVIGATION BAR -->
   <nav class="bottom-nav-fix fixed bottom-0 left-0 right-0 w-full z-40 bg-[#141824] text-white rounded-t-2xl shadow-2xl border-t border-white/10 pt-2.5 px-2">
     <div class="grid grid-cols-4 items-center max-w-md mx-auto">
-      
-      <!-- Tab 1: Ana Sayfa -->
       <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-tab-btn flex flex-col items-center justify-center gap-1 py-1.5 text-white transition-opacity">
         <svg class="w-5 h-5 stroke-current fill-none stroke-[1.8]" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
           <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
@@ -360,7 +396,6 @@
         <span class="text-[11px] leading-none whitespace-nowrap tracking-tight">Ana Sayfa</span>
       </button>
 
-      <!-- Tab 2: Alışkanlıklar -->
       <button onclick="switchTab('habits')" id="nav-habits" class="nav-tab-btn flex flex-col items-center justify-center gap-1 py-1.5 text-white/50 hover:text-white transition-opacity">
         <svg class="w-5 h-5 stroke-current fill-none stroke-[1.8]" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
           <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
@@ -369,7 +404,6 @@
         <span class="text-[11px] leading-none whitespace-nowrap tracking-tight">Alışkanlıklar</span>
       </button>
 
-      <!-- Tab 3: Analiz -->
       <button onclick="switchTab('analysis')" id="nav-analysis" class="nav-tab-btn flex flex-col items-center justify-center gap-1 py-1.5 text-white/50 hover:text-white transition-opacity">
         <svg class="w-5 h-5 stroke-current fill-none stroke-[1.8]" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
           <line x1="18" y1="20" x2="18" y2="10"/>
@@ -379,14 +413,12 @@
         <span class="text-[11px] leading-none whitespace-nowrap tracking-tight">Analiz</span>
       </button>
 
-      <!-- Tab 4: Hedefler -->
       <button onclick="switchTab('goals')" id="nav-goals" class="nav-tab-btn flex flex-col items-center justify-center gap-1 py-1.5 text-white/50 hover:text-white transition-opacity">
         <svg class="w-5 h-5 stroke-current fill-none stroke-[1.8]" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
           <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
         </svg>
         <span class="text-[11px] leading-none whitespace-nowrap tracking-tight">Hedefler</span>
       </button>
-
     </div>
   </nav>
 
@@ -394,10 +426,10 @@
 
   <!-- Add Task Modal -->
   <div id="modal-task" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
-    <div class="bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl p-5 space-y-4 animate-in slide-in-from-bottom duration-200">
-      <div class="flex items-center justify-between border-b pb-3">
-        <h3 class="text-sm font-medium text-[#1D1D1F]">Yeni Görev Ekle</h3>
-        <button onclick="closeModal('modal-task')" class="text-[#8E8E93] hover:text-[#1D1D1F]">
+    <div class="bg-white dark:bg-[#161923] w-full max-w-md rounded-t-2xl sm:rounded-2xl p-5 space-y-4">
+      <div class="flex items-center justify-between border-b border-black/[0.06] dark:border-white/[0.08] pb-3">
+        <h3 class="text-sm font-medium text-[#1D1D1F] dark:text-[#F3F4F6]">Yeni Görev Ekle</h3>
+        <button onclick="closeModal('modal-task')" class="text-[#8E8E93] hover:text-[#1D1D1F] dark:hover:text-white">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
       </div>
@@ -405,32 +437,32 @@
       <div class="space-y-3 text-xs">
         <div>
           <label class="block text-[#8E8E93] mb-1">Görev Adı</label>
-          <input id="input-task-title" type="text" placeholder="Örn: Kitap Oku (20 Sayfa)" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] border border-black/[0.04] focus:outline-none focus:ring-1 focus:ring-[#141824]">
+          <input id="input-task-title" type="text" placeholder="Örn: Kitap Oku (20 Sayfa)" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[#1D1D1F] dark:text-[#F3F4F6] border border-black/[0.04] dark:border-white/[0.08] focus:outline-none focus:ring-1 focus:ring-[#141824] dark:focus:ring-white/30">
         </div>
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label class="block text-[#8E8E93] mb-1">Puan (1-100)</label>
-            <input id="input-task-points" type="number" min="1" max="100" value="10" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] border border-black/[0.04] focus:outline-none focus:ring-1 focus:ring-[#141824] tabular-nums">
+            <input id="input-task-points" type="number" min="1" max="100" value="10" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[#1D1D1F] dark:text-[#F3F4F6] border border-black/[0.04] dark:border-white/[0.08] focus:outline-none focus:ring-1 focus:ring-[#141824] tabular-nums">
           </div>
           <div>
             <label class="block text-[#8E8E93] mb-1">Hatırlatıcı Saati (Opsiyonel)</label>
-            <input id="input-task-time" type="time" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] border border-black/[0.04] focus:outline-none focus:ring-1 focus:ring-[#141824] tabular-nums">
+            <input id="input-task-time" type="time" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[#1D1D1F] dark:text-[#F3F4F6] border border-black/[0.04] dark:border-white/[0.08] focus:outline-none focus:ring-1 focus:ring-[#141824] tabular-nums">
           </div>
         </div>
       </div>
 
       <div class="flex gap-2 pt-2">
-        <button onclick="closeModal('modal-task')" class="flex-1 py-2.5 rounded-xl bg-[#E5E5EA] text-[#1D1D1F] text-xs font-normal">İptal</button>
-        <button onclick="saveTask()" class="flex-1 py-2.5 rounded-xl bg-[#141824] text-white text-xs font-normal">Kaydet</button>
+        <button onclick="closeModal('modal-task')" class="flex-1 py-2.5 rounded-xl bg-[#E5E5EA] dark:bg-[#232838] text-[#1D1D1F] dark:text-[#F3F4F6] text-xs font-normal">İptal</button>
+        <button onclick="saveTask()" class="flex-1 py-2.5 rounded-xl bg-[#141824] dark:bg-[#F25C19] text-white text-xs font-normal">Kaydet</button>
       </div>
     </div>
   </div>
 
   <!-- Add Habit Modal -->
   <div id="modal-habit" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
-    <div class="bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl p-5 space-y-4">
-      <div class="flex items-center justify-between border-b pb-3">
-        <h3 class="text-sm font-medium text-[#1D1D1F]">Yeni Alışkanlık Ekle</h3>
+    <div class="bg-white dark:bg-[#161923] w-full max-w-md rounded-t-2xl sm:rounded-2xl p-5 space-y-4">
+      <div class="flex items-center justify-between border-b border-black/[0.06] dark:border-white/[0.08] pb-3">
+        <h3 class="text-sm font-medium text-[#1D1D1F] dark:text-[#F3F4F6]">Yeni Alışkanlık Ekle</h3>
         <button onclick="closeModal('modal-habit')" class="text-[#8E8E93]">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
@@ -439,14 +471,14 @@
       <div class="space-y-3 text-xs">
         <div>
           <label class="block text-[#8E8E93] mb-1">Alışkanlık Başlığı</label>
-          <input id="input-habit-title" type="text" placeholder="Örn: 2 Litre Su İç" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] border border-black/[0.04] focus:outline-none focus:ring-1 focus:ring-[#141824]">
+          <input id="input-habit-title" type="text" placeholder="Örn: 2 Litre Su İç" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[#1D1D1F] dark:text-[#F3F4F6] border border-black/[0.04] dark:border-white/[0.08] focus:outline-none focus:ring-1 focus:ring-[#141824]">
         </div>
         <div>
           <label class="block text-[#8E8E93] mb-1">Kart Teması</label>
-          <select id="input-habit-theme" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] border border-black/[0.04] focus:outline-none focus:ring-1 focus:ring-[#141824]">
+          <select id="input-habit-theme" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[#1D1D1F] dark:text-[#F3F4F6] border border-black/[0.04] dark:border-white/[0.08] focus:outline-none focus:ring-1 focus:ring-[#141824]">
             <option value="navy">Lacivert (Navy)</option>
             <option value="emerald">Zümrüt (Emerald)</option>
-            <option value="amber">Kehrİbar (Amber)</option>
+            <option value="amber">Kehribar (Amber)</option>
             <option value="orange">Turuncu (Orange)</option>
             <option value="pink">Pembe (Pink)</option>
           </select>
@@ -454,17 +486,17 @@
       </div>
 
       <div class="flex gap-2 pt-2">
-        <button onclick="closeModal('modal-habit')" class="flex-1 py-2.5 rounded-xl bg-[#E5E5EA] text-[#1D1D1F] text-xs font-normal">İptal</button>
-        <button onclick="saveHabit()" class="flex-1 py-2.5 rounded-xl bg-[#141824] text-white text-xs font-normal">Kaydet</button>
+        <button onclick="closeModal('modal-habit')" class="flex-1 py-2.5 rounded-xl bg-[#E5E5EA] dark:bg-[#232838] text-[#1D1D1F] dark:text-[#F3F4F6] text-xs font-normal">İptal</button>
+        <button onclick="saveHabit()" class="flex-1 py-2.5 rounded-xl bg-[#141824] dark:bg-[#F25C19] text-white text-xs font-normal">Kaydet</button>
       </div>
     </div>
   </div>
 
   <!-- Add Goal Modal -->
   <div id="modal-goal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
-    <div class="bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl p-5 space-y-4">
-      <div class="flex items-center justify-between border-b pb-3">
-        <h3 class="text-sm font-medium text-[#1D1D1F]">Yeni Hedef Ekle</h3>
+    <div class="bg-white dark:bg-[#161923] w-full max-w-md rounded-t-2xl sm:rounded-2xl p-5 space-y-4">
+      <div class="flex items-center justify-between border-b border-black/[0.06] dark:border-white/[0.08] pb-3">
+        <h3 class="text-sm font-medium text-[#1D1D1F] dark:text-[#F3F4F6]">Yeni Hedef Ekle</h3>
         <button onclick="closeModal('modal-goal')" class="text-[#8E8E93]">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
@@ -473,70 +505,75 @@
       <div class="space-y-3 text-xs">
         <div>
           <label class="block text-[#8E8E93] mb-1">Hedef Başlığı</label>
-          <input id="input-goal-title" type="text" placeholder="Örn: B2 İngilizce Seviyesi" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] border border-black/[0.04] focus:outline-none focus:ring-1 focus:ring-[#141824]">
+          <input id="input-goal-title" type="text" placeholder="Örn: B2 İngilizce Seviyesi" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[#1D1D1F] dark:text-[#F3F4F6] border border-black/[0.04] dark:border-white/[0.08] focus:outline-none focus:ring-1 focus:ring-[#141824]">
         </div>
         <div>
           <label class="block text-[#8E8E93] mb-1">Hedef Tarihi</label>
-          <input id="input-goal-date" type="date" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] border border-black/[0.04] focus:outline-none focus:ring-1 focus:ring-[#141824] tabular-nums">
+          <input id="input-goal-date" type="date" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[#1D1D1F] dark:text-[#F3F4F6] border border-black/[0.04] dark:border-white/[0.08] focus:outline-none focus:ring-1 focus:ring-[#141824] tabular-nums">
         </div>
         <div>
           <label class="block text-[#8E8E93] mb-1">Alt Aşamalar (Her satıra bir adet)</label>
           <textarea id="input-goal-milestones" rows="3" placeholder="Kelime ezberle
 Grammar tekrar et
-Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] border border-black/[0.04] focus:outline-none focus:ring-1 focus:ring-[#141824] resize-none"></textarea>
+Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[#1D1D1F] dark:text-[#F3F4F6] border border-black/[0.04] dark:border-white/[0.08] focus:outline-none focus:ring-1 focus:ring-[#141824] resize-none"></textarea>
         </div>
       </div>
 
       <div class="flex gap-2 pt-2">
-        <button onclick="closeModal('modal-goal')" class="flex-1 py-2.5 rounded-xl bg-[#E5E5EA] text-[#1D1D1F] text-xs font-normal">İptal</button>
-        <button onclick="saveGoal()" class="flex-1 py-2.5 rounded-xl bg-[#141824] text-white text-xs font-normal">Kaydet</button>
+        <button onclick="closeModal('modal-goal')" class="flex-1 py-2.5 rounded-xl bg-[#E5E5EA] dark:bg-[#232838] text-[#1D1D1F] dark:text-[#F3F4F6] text-xs font-normal">İptal</button>
+        <button onclick="saveGoal()" class="flex-1 py-2.5 rounded-xl bg-[#141824] dark:bg-[#F25C19] text-white text-xs font-normal">Kaydet</button>
       </div>
     </div>
   </div>
 
-  <!-- Settings Modal (Notifications, Backup Export/Import & True Factory Reset) -->
+  <!-- Settings Modal -->
   <div id="modal-settings" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
-    <div class="bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl p-5 space-y-4">
-      <div class="flex items-center justify-between border-b pb-3">
-        <h3 class="text-sm font-medium text-[#1D1D1F]">Ayarlar ve Veri Yönetimi</h3>
+    <div class="bg-white dark:bg-[#161923] w-full max-w-md rounded-t-2xl sm:rounded-2xl p-5 space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-black/[0.06] dark:border-white/[0.08] pb-3">
+        <h3 class="text-sm font-medium text-[#1D1D1F] dark:text-[#F3F4F6]">Ayarlar ve Veri Yönetimi</h3>
         <button onclick="closeModal('modal-settings')" class="text-[#8E8E93]">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
       </div>
 
       <div class="space-y-3 text-xs">
+        <!-- Appearance Section -->
+        <div class="p-3 bg-[#F5F5F7] dark:bg-[#1C202E] rounded-xl flex items-center justify-between">
+          <span class="font-medium text-[#1D1D1F] dark:text-[#F3F4F6]">Koyu Mod</span>
+          <button id="toggle-dark-btn" onclick="toggleDarkMode()" class="w-10 h-5 rounded-full bg-[#D1D1D6] relative transition-colors" aria-label="Koyu Mod">
+            <span id="toggle-dark-dot" class="w-4 h-4 rounded-full bg-white absolute top-0.5 left-0.5 transition-all"></span>
+          </button>
+        </div>
+
         <!-- Notifications Section -->
-        <div class="p-3 bg-[#F5F5F7] rounded-xl space-y-2.5">
+        <div class="p-3 bg-[#F5F5F7] dark:bg-[#1C202E] rounded-xl space-y-2.5">
           <div class="flex items-center justify-between">
-            <span class="font-medium text-[#1D1D1F]">Bildirimler & Hatırlatıcı</span>
-            <span id="notif-status-badge" class="text-[10px] px-2 py-0.5 rounded-full bg-[#E5E5EA] text-[#545456]">Kontrol ediliyor</span>
+            <span class="font-medium text-[#1D1D1F] dark:text-[#F3F4F6]">Bildirimler & Hatırlatıcı</span>
+            <span id="notif-status-badge" class="text-[10px] px-2 py-0.5 rounded-full bg-[#E5E5EA] dark:bg-[#232838] text-[#545456] dark:text-[#D1D5DB]">Kontrol ediliyor</span>
           </div>
           <div class="flex items-center justify-between pt-0.5">
-            <span class="text-[#545456]">Sesli Hatırlatıcı</span>
+            <span class="text-[#545456] dark:text-[#9CA3AF]">Sesli Hatırlatıcı (23:30 dahil)</span>
             <button id="toggle-sound-btn" onclick="toggleSoundSetting()" class="w-10 h-5 rounded-full bg-[#141824] relative transition-colors" aria-label="Sesli Hatırlatıcı">
               <span id="toggle-sound-dot" class="w-4 h-4 rounded-full bg-white absolute top-0.5 right-0.5 transition-all"></span>
             </button>
           </div>
           <div class="flex gap-2 pt-1">
-            <button onclick="requestNotificationPermission()" class="flex-1 py-2 rounded-lg bg-white border border-black/[0.06] text-[#1D1D1F] hover:bg-gray-50 flex items-center justify-center gap-1.5 shadow-sm">
-              <svg class="w-3.5 h-3.5 text-[#545456]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+            <button onclick="requestNotificationPermission()" class="flex-1 py-2 rounded-lg bg-white dark:bg-[#161923] border border-black/[0.06] dark:border-white/[0.08] text-[#1D1D1F] dark:text-[#F3F4F6] flex items-center justify-center gap-1.5 shadow-sm">
               <span>Bildirim İzni Ver</span>
             </button>
-            <button onclick="sendTestNotification()" class="flex-1 py-2 rounded-lg bg-white border border-black/[0.06] text-[#1D1D1F] hover:bg-gray-50 flex items-center justify-center gap-1.5 shadow-sm">
+            <button onclick="sendTestNotification()" class="flex-1 py-2 rounded-lg bg-white dark:bg-[#161923] border border-black/[0.06] dark:border-white/[0.08] text-[#1D1D1F] dark:text-[#F3F4F6] flex items-center justify-center gap-1.5 shadow-sm">
               <span>Test Gönder</span>
             </button>
           </div>
         </div>
 
-        <div class="p-3 bg-[#F5F5F7] rounded-xl space-y-2">
-          <span class="font-medium text-[#1D1D1F] block">Yedekleme & Geri Yükleme</span>
+        <div class="p-3 bg-[#F5F5F7] dark:bg-[#1C202E] rounded-xl space-y-2">
+          <span class="font-medium text-[#1D1D1F] dark:text-[#F3F4F6] block">Yedekleme & Geri Yükleme</span>
           <div class="flex gap-2">
-            <button onclick="exportJSONBackup()" class="flex-1 py-2 rounded-lg bg-white border border-black/[0.06] text-[#1D1D1F] hover:bg-gray-50 flex items-center justify-center gap-1.5 shadow-sm">
-              <svg class="w-3.5 h-3.5 text-[#545456]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            <button onclick="exportJSONBackup()" class="flex-1 py-2 rounded-lg bg-white dark:bg-[#161923] border border-black/[0.06] dark:border-white/[0.08] text-[#1D1D1F] dark:text-[#F3F4F6] flex items-center justify-center gap-1.5 shadow-sm">
               <span>Yedek İndir (JSON)</span>
             </button>
-            <button onclick="document.getElementById('import-file-input').click()" class="flex-1 py-2 rounded-lg bg-white border border-black/[0.06] text-[#1D1D1F] hover:bg-gray-50 flex items-center justify-center gap-1.5 shadow-sm">
-              <svg class="w-3.5 h-3.5 text-[#545456]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+            <button onclick="document.getElementById('import-file-input').click()" class="flex-1 py-2 rounded-lg bg-white dark:bg-[#161923] border border-black/[0.06] dark:border-white/[0.08] text-[#1D1D1F] dark:text-[#F3F4F6] flex items-center justify-center gap-1.5 shadow-sm">
               <span>Yedek Yükle</span>
             </button>
             <input type="file" id="import-file-input" accept=".json" class="hidden" onchange="importJSONBackup(event)">
@@ -544,7 +581,7 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] border border-black/[0.0
         </div>
 
         <!-- True Factory Reset Button -->
-        <div class="p-3 bg-red-50 rounded-xl border border-red-100 space-y-2">
+        <div class="p-3 bg-red-50 dark:bg-red-950/30 rounded-xl border border-red-100 dark:border-red-900/40 space-y-2">
           <span class="font-medium text-[#FF3B30] block">Tüm Verileri Sıfırla</span>
           <p class="text-[11px] text-[#8E8E93]">Tüm görev, alışkanlık, skor ve geçmiş kayıtlarınızı kalıcı olarak siler ve uygulamayı sıfırlar.</p>
           <button onclick="performFactoryReset()" class="w-full py-2 rounded-lg bg-[#FF3B30] active:bg-red-700 text-white font-medium shadow-sm transition-colors">
@@ -553,12 +590,12 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] border border-black/[0.0
         </div>
       </div>
 
-      <button onclick="closeModal('modal-settings')" class="w-full py-2.5 rounded-xl bg-[#E5E5EA] text-[#1D1D1F] text-xs font-normal">Kapat</button>
+      <button onclick="closeModal('modal-settings')" class="w-full py-2.5 rounded-xl bg-[#E5E5EA] dark:bg-[#232838] text-[#1D1D1F] dark:text-[#F3F4F6] text-xs font-normal">Kapat</button>
     </div>
   </div>
 
-  <!-- Notification Toast Container -->
-  <div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 bg-[#141824] text-white px-4 py-2.5 rounded-full text-xs font-normal shadow-xl transition-all duration-300 opacity-0 pointer-events-none z-50 flex items-center gap-2">
+  <!-- Notification Toast Container (Centered in middle of screen, clear of Dynamic Island) -->
+  <div id="toast" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#141824] dark:bg-[#F3F4F6] text-white dark:text-[#141824] px-5 py-3 rounded-2xl text-xs font-medium shadow-2xl transition-all duration-200 opacity-0 pointer-events-none z-50 flex items-center gap-2 text-center max-w-[85vw]">
     <span id="toast-message">Bildirim</span>
   </div>
 
@@ -569,21 +606,22 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] border border-black/[0.0
     // LOCAL STORAGE STATE & IN-MEMORY MODEL
     // -------------------------------------------------------------
     const STORAGE_KEY = 'gunluk_takip_pwa_v2';
+    let selectedAnalysisDate = null;
+
     let appState = {
       initialized: false,
       user: { name: 'Burak' },
-      settings: { soundEnabled: true },
+      settings: { soundEnabled: true, darkMode: false },
       tasks: [],
       habits: [],
       goals: [],
-      evaluations: {} // key: YYYY-MM-DD -> { mood: 1-5, rating: 1-10, note: '' }
+      evaluations: {}
     };
 
-    // Default Initial Demo Data
     const defaultData = {
       initialized: true,
       user: { name: 'Burak' },
-      settings: { soundEnabled: true },
+      settings: { soundEnabled: true, darkMode: false },
       tasks: [
         { id: 't1', title: 'Sabah Yürüyüşü (30 dk)', points: 15, time: '08:00', completed: true },
         { id: 't2', title: 'Kitap Oku (20 Sayfa)', points: 20, time: '14:30', completed: false },
@@ -592,7 +630,7 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] border border-black/[0.0
       habits: [
         { id: 'h1', title: 'Su İçme (2.5L)', theme: 'navy', checkIns: {} },
         { id: 'h2', title: 'Kitap Okuma', theme: 'emerald', checkIns: {} },
-        { id: 'h3', title: 'Ezersiz / Spor', theme: 'amber', checkIns: {} },
+        { id: 'h3', title: 'Egzersiz / Spor', theme: 'amber', checkIns: {} },
         { id: 'h4', title: 'Yazılım Çalışma', theme: 'orange', checkIns: {} }
       ],
       goals: [
@@ -610,19 +648,27 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] border border-black/[0.0
       evaluations: {}
     };
 
-    // Helper: Today's date string YYYY-MM-DD
     function getTodayStr() {
       const d = new Date();
-      return d.toISOString().split('T')[0];
+      const offset = d.getTimezoneOffset();
+      const local = new Date(d.getTime() - offset * 60000);
+      return local.toISOString().split('T')[0];
     }
 
-    // Load Data
+    function getDateStrDaysAgo(daysAgo) {
+      const d = new Date();
+      d.setDate(d.getDate() - daysAgo);
+      const offset = d.getTimezoneOffset();
+      const local = new Date(d.getTime() - offset * 60000);
+      return local.toISOString().split('T')[0];
+    }
+
     function loadState() {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
         try {
           appState = JSON.parse(stored);
-          if (!appState.settings) appState.settings = { soundEnabled: true };
+          if (!appState.settings) appState.settings = { soundEnabled: true, darkMode: false };
         } catch (e) {
           appState = defaultData;
         }
@@ -630,30 +676,69 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] border border-black/[0.0
         appState = defaultData;
         saveState();
       }
+      applyTheme();
       renderApp();
     }
 
-    // Save Data
     function saveState() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
       renderApp();
     }
 
     // -------------------------------------------------------------
+    // DARK MODE
+    // -------------------------------------------------------------
+    function applyTheme() {
+      const isDark = !!appState.settings?.darkMode;
+      const htmlEl = document.documentElement;
+      const metaTheme = document.getElementById('meta-theme-color');
+      const iconMoon = document.getElementById('icon-moon');
+      const iconSun = document.getElementById('icon-sun');
+
+      if (isDark) {
+        htmlEl.classList.add('dark');
+        if (metaTheme) metaTheme.setAttribute('content', '#0B0D14');
+        if (iconMoon) iconMoon.classList.add('hidden');
+        if (iconSun) iconSun.classList.remove('hidden');
+      } else {
+        htmlEl.classList.remove('dark');
+        if (metaTheme) metaTheme.setAttribute('content', '#F5F5F7');
+        if (iconMoon) iconMoon.classList.remove('hidden');
+        if (iconSun) iconSun.classList.add('hidden');
+      }
+
+      const btn = document.getElementById('toggle-dark-btn');
+      const dot = document.getElementById('toggle-dark-dot');
+      if (btn && dot) {
+        if (isDark) {
+          btn.className = 'w-10 h-5 rounded-full bg-[#F25C19] relative transition-colors';
+          dot.className = 'w-4 h-4 rounded-full bg-white absolute top-0.5 right-0.5 transition-all';
+        } else {
+          btn.className = 'w-10 h-5 rounded-full bg-[#D1D1D6] relative transition-colors';
+          dot.className = 'w-4 h-4 rounded-full bg-white absolute top-0.5 left-0.5 transition-all';
+        }
+      }
+    }
+
+    function toggleDarkMode() {
+      if (!appState.settings) appState.settings = { soundEnabled: true, darkMode: false };
+      appState.settings.darkMode = !appState.settings.darkMode;
+      applyTheme();
+      saveState();
+    }
+
+    // -------------------------------------------------------------
     // PWA DYNAMIC MANIFEST & DYNAMIC CANVAS ICON GENERATION
     // -------------------------------------------------------------
     function setupPWAAssets() {
-      // 1. Generate 512x512 Canvas Icon (Solid White Background + Centered Pastel Sky Blue Circle)
       const canvas = document.createElement('canvas');
       canvas.width = 512;
       canvas.height = 512;
       const ctx = canvas.getContext('2d');
 
-      // Solid White #FFFFFF Background
       ctx.fillStyle = '#FFFFFF';
       ctx.fillRect(0, 0, 512, 512);
 
-      // Soft Pastel Sky-Blue #A3D5FF Circle
       ctx.fillStyle = '#A3D5FF';
       ctx.beginPath();
       ctx.arc(256, 256, 128, 0, Math.PI * 2);
@@ -661,7 +746,6 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] border border-black/[0.0
 
       const iconDataUrl = canvas.toDataURL('image/png');
 
-      // 2. Set Apple Touch Icon & Favicon
       let appleIcon = document.querySelector("link[rel='apple-touch-icon']");
       if (!appleIcon) {
         appleIcon = document.createElement('link');
@@ -679,7 +763,6 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] border border-black/[0.0
       }
       favicon.href = iconDataUrl;
 
-      // 3. Inject Dynamic PWA Manifest
       const manifest = {
         name: 'Günlük Takip',
         short_name: 'Takip',
@@ -702,14 +785,12 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] border border-black/[0.0
       manifestLink.href = manifestURL;
     }
 
-    // Run immediately so iOS Safari picks up the icon before onload
     setupPWAAssets();
 
-    // Register Inline Service Worker for Offline PWA Support
     function registerServiceWorker() {
       if ('serviceWorker' in navigator) {
         const swCode = `
-          const CACHE_NAME = 'gunluk-takip-v2';
+          const CACHE_NAME = 'gunluk-takip-v3';
           self.addEventListener('install', e => {
             e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(['./index.html'])));
             self.skipWaiting();
@@ -753,7 +834,6 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] border border-black/[0.0
       document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
       document.getElementById(`tab-${tabId}`).classList.remove('hidden');
 
-      // Update Nav Buttons
       document.querySelectorAll('.nav-tab-btn').forEach(btn => {
         btn.classList.remove('text-white');
         btn.classList.add('text-white/50');
@@ -763,6 +843,7 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] border border-black/[0.0
         activeBtn.classList.remove('text-white/50');
         activeBtn.classList.add('text-white');
       }
+      document.getElementById('app-container').scrollTop = 0;
     }
 
     // -------------------------------------------------------------
@@ -771,28 +852,50 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] border border-black/[0.0
     let currentSelectedMood = null;
     let currentSelectedRating = null;
 
-    function renderDashboard() {
-      // 1. Calculate Görev Puanı
+    function getTodayTaskStats() {
+      const todayStr = getTodayStr();
       const tasks = appState.tasks || [];
-      const totalPoints = tasks.reduce((sum, t) => sum + (t.points || 10), 0);
-      const completedPoints = tasks.filter(t => t.completed).reduce((sum, t) => sum + (t.points || 10), 0);
-      const taskScore = totalPoints > 0 ? Math.round((completedPoints / totalPoints) * 100) : 0;
-      
-      document.getElementById('dash-task-score').textContent = `${taskScore}%`;
-      document.getElementById('dash-task-count').textContent = `${tasks.filter(t => t.completed).length}/${tasks.length}`;
+      const habits = appState.habits || [];
 
-      // 2. Mood & Gün Derecesi
+      const taskTotalPts = tasks.reduce((sum, t) => sum + (t.points || 10), 0);
+      const taskDonePts = tasks.filter(t => t.completed).reduce((sum, t) => sum + (t.points || 10), 0);
+
+      const habitTotalPts = habits.length * 10;
+      const habitDoneCount = habits.filter(h => h.checkIns && h.checkIns[todayStr]).length;
+      const habitDonePts = habitDoneCount * 10;
+
+      const totalPoints = taskTotalPts + habitTotalPts;
+      const completedPoints = taskDonePts + habitDonePts;
+      const totalCount = tasks.length + habits.length;
+      const completedCount = tasks.filter(t => t.completed).length + habitDoneCount;
+      const score = totalPoints > 0 ? Math.round((completedPoints / totalPoints) * 100) : 0;
+
+      return { score, completedCount, totalCount };
+    }
+
+    function getTodayCombinedScore() {
+      const { score: taskScore } = getTodayTaskStats();
+      const todayStr = getTodayStr();
+      const todayEval = appState.evaluations[todayStr];
+      const moodRating = todayEval ? todayEval.rating : null;
+
+      if (moodRating) {
+        return Math.round((taskScore * 0.6) + (moodRating * 10 * 0.4));
+      }
+      return taskScore;
+    }
+
+    function renderDashboard() {
+      const { score: taskScore, completedCount, totalCount } = getTodayTaskStats();
+      document.getElementById('dash-task-score').textContent = `${taskScore}%`;
+      document.getElementById('dash-task-count').textContent = `${completedCount}/${totalCount}`;
+
       const todayStr = getTodayStr();
       const todayEval = appState.evaluations[todayStr];
       const moodRating = todayEval ? todayEval.rating : null;
       document.getElementById('dash-mood-score').textContent = moodRating ? `${moodRating}/10` : '-';
 
-      // 3. Combined Score
-      let combinedScore = taskScore;
-      if (moodRating) {
-        const moodPercent = moodRating * 10;
-        combinedScore = Math.round((taskScore * 0.6) + (moodPercent * 0.4));
-      }
+      const combinedScore = getTodayCombinedScore();
       document.getElementById('dash-combined-score').textContent = `${combinedScore}%`;
       document.getElementById('dash-combined-badge').textContent = `${combinedScore}%`;
 
@@ -803,75 +906,116 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] border border-black/[0.0
       else if (combinedScore > 0) summaryText = 'Tamamlanması Gerekenler Var';
       document.getElementById('dash-combined-text').textContent = summaryText;
 
-      // 4. Render Weekly Bars
       renderWeeklyBars();
-
-      // 5. Render Tasks List
       renderTasksList();
-
-      // 6. Setup Rating Buttons 1-10
+      renderDashboardGoals();
       renderRatingButtons();
 
-      // Sync today's saved evaluation if exists
       if (todayEval) {
         selectMood(todayEval.mood, false);
         selectRating(todayEval.rating, false);
         document.getElementById('daily-note').value = todayEval.note || '';
+      } else {
+        currentSelectedMood = null;
+        currentSelectedRating = null;
+        document.getElementById('daily-note').value = '';
+        document.querySelectorAll('.mood-btn').forEach(btn => btn.classList.remove('bg-gray-100', 'dark:bg-white/10', 'ring-1', 'ring-[#141824]', 'dark:ring-white/40'));
       }
     }
 
-    // Weekly Bars Rendering
+    // Real Weekly Bars Rendering (Last 7 Days - zero dummy data)
     function renderWeeklyBars() {
       const container = document.getElementById('weekly-bars-container');
       container.innerHTML = '';
-      const days = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
+      const dayNames = ['Paz', 'Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt'];
+      const todayStr = getTodayStr();
 
-      days.forEach((day, idx) => {
-        const heightPct = idx === 6 ? 33 : (idx === 5 ? 0 : Math.min(100, (idx + 1) * 12));
-        
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const dStr = getDateStrDaysAgo(i);
+        const dayLabel = dayNames[d.getDay()];
+
+        let heightPct = 0;
+        if (dStr === todayStr) {
+          heightPct = getTodayCombinedScore();
+        } else if (appState.evaluations[dStr]) {
+          const ev = appState.evaluations[dStr];
+          heightPct = ev.combinedScore != null ? ev.combinedScore : (ev.rating ? ev.rating * 10 : 0);
+        }
+
         const wrapper = document.createElement('div');
         wrapper.className = 'flex flex-col items-center gap-1.5 h-full justify-end';
 
         const barBg = document.createElement('div');
-        barBg.className = 'w-full bg-[#F5F5F7] rounded-lg h-20 flex items-end p-0.5 overflow-hidden';
+        barBg.className = 'w-full bg-[#F5F5F7] dark:bg-[#232838] rounded-lg h-20 flex items-end p-0.5 overflow-hidden';
 
         const barFill = document.createElement('div');
         barFill.className = 'w-full bg-[#F25C19] rounded-md transition-all duration-300';
-        barFill.style.height = `${heightPct}%`;
+        barFill.style.height = `${Math.max(0, Math.min(100, heightPct))}%`;
 
         barBg.appendChild(barFill);
 
         const label = document.createElement('span');
-        label.className = 'text-[10px] text-[#8E8E93] font-normal';
-        label.textContent = day;
+        label.className = `text-[10px] font-normal ${dStr === todayStr ? 'text-[#F25C19] font-medium' : 'text-[#8E8E93]'}`;
+        label.textContent = dayLabel;
 
         wrapper.appendChild(barBg);
         wrapper.appendChild(label);
         container.appendChild(wrapper);
-      });
+      }
     }
 
-    // Render Daily Tasks List
+    // Render Daily Tasks List (Habits + Manual Tasks)
     function renderTasksList() {
       const container = document.getElementById('tasks-list');
       container.innerHTML = '';
+      const todayStr = getTodayStr();
+      const habits = appState.habits || [];
+      const tasks = appState.tasks || [];
 
-      if (appState.tasks.length === 0) {
-        container.innerHTML = '<p class="text-xs text-[#8E8E93] text-center py-4 italic">Henüz eklenmiş görev yok.</p>';
+      if (habits.length === 0 && tasks.length === 0) {
+        container.innerHTML = '<p class="text-xs text-[#8E8E93] text-center py-4 italic">Henüz eklenmiş görev veya alışkanlık yok.</p>';
         return;
       }
 
-      appState.tasks.forEach(t => {
+      // 1. Habits as Daily Tasks
+      habits.forEach(h => {
+        const isDone = !!(h.checkIns && h.checkIns[todayStr]);
         const item = document.createElement('div');
-        item.className = `flex items-center justify-between p-3 rounded-xl bg-white border border-black/[0.04] transition-all ${t.completed ? 'opacity-60' : ''}`;
+        item.className = `flex items-center justify-between p-3 rounded-xl bg-white dark:bg-[#161923] border border-black/[0.04] dark:border-white/[0.06] transition-all ${isDone ? 'opacity-60' : ''}`;
 
         item.innerHTML = `
           <div class="flex items-center gap-3">
-            <button onclick="toggleTask('${t.id}')" class="w-5 h-5 rounded-md border flex items-center justify-center transition-colors ${t.completed ? 'bg-[#F25C19] border-[#F25C19] text-white' : 'border-[#D1D1D6] bg-white'}">
+            <button onclick="toggleHabitCheckIn('${h.id}')" class="w-5 h-5 rounded-md border flex items-center justify-center transition-colors ${isDone ? 'bg-[#F25C19] border-[#F25C19] text-white' : 'border-[#D1D1D6] dark:border-white/20 bg-white dark:bg-[#1C202E]'}">
+              ${isDone ? '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>' : ''}
+            </button>
+            <div>
+              <div class="flex items-center gap-1.5">
+                <span class="text-xs font-normal text-[#1D1D1F] dark:text-[#F3F4F6] ${isDone ? 'line-through text-[#8E8E93]' : ''}">${escapeHtml(h.title)}</span>
+                <span class="text-[9px] px-1.5 py-0.5 rounded-md bg-[#EEF4FF] dark:bg-white/10 text-[#5E5CE6] dark:text-[#A3D5FF]">Alışkanlık</span>
+              </div>
+              <div class="flex items-center gap-2 mt-0.5 text-[10px] text-[#8E8E93] tabular-nums">
+                <span>+10 Puan</span>
+              </div>
+            </div>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+
+      // 2. Manual Tasks
+      tasks.forEach(t => {
+        const item = document.createElement('div');
+        item.className = `flex items-center justify-between p-3 rounded-xl bg-white dark:bg-[#161923] border border-black/[0.04] dark:border-white/[0.06] transition-all ${t.completed ? 'opacity-60' : ''}`;
+
+        item.innerHTML = `
+          <div class="flex items-center gap-3">
+            <button onclick="toggleTask('${t.id}')" class="w-5 h-5 rounded-md border flex items-center justify-center transition-colors ${t.completed ? 'bg-[#F25C19] border-[#F25C19] text-white' : 'border-[#D1D1D6] dark:border-white/20 bg-white dark:bg-[#1C202E]'}">
               ${t.completed ? '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>' : ''}
             </button>
             <div>
-              <span class="text-xs font-normal text-[#1D1D1F] ${t.completed ? 'line-through text-[#8E8E93]' : ''}">${escapeHtml(t.title)}</span>
+              <span class="text-xs font-normal text-[#1D1D1F] dark:text-[#F3F4F6] ${t.completed ? 'line-through text-[#8E8E93]' : ''}">${escapeHtml(t.title)}</span>
               <div class="flex items-center gap-2 mt-0.5 text-[10px] text-[#8E8E93] tabular-nums">
                 <span>+${t.points} Puan</span>
                 ${t.time ? `<span>• ${t.time}</span>` : ''}
@@ -879,12 +1023,58 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] border border-black/[0.0
             </div>
           </div>
           <div class="flex items-center gap-1">
-            <button onclick="exportTaskToICS('${t.id}')" class="p-1.5 text-[#8E8E93] hover:text-[#1D1D1F] transition-colors" title="iCal Takvime Ekle">
+            <button onclick="exportTaskToICS('${t.id}')" class="p-1.5 text-[#8E8E93] hover:text-[#1D1D1F] dark:hover:text-white transition-colors" title="iCal Takvime Ekle">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
             </button>
             <button onclick="deleteTask('${t.id}')" class="p-1.5 text-[#8E8E93] hover:text-[#FF3B30] transition-colors" title="Sil">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
             </button>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    // Render Dashboard Goals Summary
+    function renderDashboardGoals() {
+      const section = document.getElementById('dash-goals-section');
+      const container = document.getElementById('dash-goals-list');
+      const goals = appState.goals || [];
+
+      if (goals.length === 0) {
+        section.classList.add('hidden');
+        return;
+      }
+
+      section.classList.remove('hidden');
+      container.innerHTML = '';
+
+      goals.forEach(g => {
+        const milestones = g.milestones || [];
+        const total = milestones.length;
+        const completed = milestones.filter(m => m.done).length;
+        const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+        let daysLeftText = '';
+        if (g.targetDate) {
+          const diffMs = new Date(g.targetDate) - new Date();
+          const days = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+          daysLeftText = days > 0 ? `${days} gün kaldı` : 'Süre doldu';
+        }
+
+        const item = document.createElement('div');
+        item.onclick = () => switchTab('goals');
+        item.className = 'p-3 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] space-y-2 cursor-pointer active:opacity-80 transition-opacity';
+        item.innerHTML = `
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-xs font-medium text-[#1D1D1F] dark:text-[#F3F4F6] truncate">${escapeHtml(g.title)}</span>
+            ${daysLeftText ? `<span class="text-[10px] px-2 py-0.5 rounded-full bg-[#F25C19]/15 text-[#F25C19] whitespace-nowrap tabular-nums">${daysLeftText}</span>` : ''}
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="flex-1 h-1.5 bg-[#E5E5EA] dark:bg-[#232838] rounded-full overflow-hidden">
+              <div class="h-full bg-[#F25C19] rounded-full transition-all duration-300" style="width: ${pct}%"></div>
+            </div>
+            <span class="text-[10px] text-[#8E8E93] tabular-nums">${pct}%</span>
           </div>
         `;
         container.appendChild(item);
@@ -905,7 +1095,6 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] border border-black/[0.0
       showToast('Görev silindi');
     }
 
-    // .ics Export for iOS Calendar
     function exportTaskToICS(id) {
       const task = appState.tasks.find(t => t.id === id);
       if (!task) return;
@@ -945,7 +1134,7 @@ END:VCALENDAR`;
         const btn = document.createElement('button');
         btn.onclick = () => selectRating(i);
         btn.setAttribute('data-rating', i);
-        btn.className = `rating-btn py-1.5 rounded-lg text-xs font-normal border tabular-nums transition-all ${currentSelectedRating === i ? 'bg-[#141824] text-white border-[#141824]' : 'bg-[#F5F5F7] text-[#1D1D1F] border-transparent hover:bg-gray-200'}`;
+        btn.className = `rating-btn py-1.5 rounded-lg text-xs font-normal border tabular-nums transition-all ${currentSelectedRating === i ? 'bg-[#141824] dark:bg-[#F25C19] text-white border-[#141824] dark:border-[#F25C19]' : 'bg-[#F5F5F7] dark:bg-[#1C202E] text-[#1D1D1F] dark:text-[#F3F4F6] border-transparent hover:bg-gray-200 dark:hover:bg-white/10'}`;
         btn.textContent = i;
         container.appendChild(btn);
       }
@@ -956,9 +1145,9 @@ END:VCALENDAR`;
       document.querySelectorAll('.mood-btn').forEach(btn => {
         const m = parseInt(btn.getAttribute('data-mood'));
         if (m === mood) {
-          btn.classList.add('bg-gray-100', 'ring-1', 'ring-[#141824]');
+          btn.classList.add('bg-gray-100', 'dark:bg-white/10', 'ring-1', 'ring-[#141824]', 'dark:ring-white/40');
         } else {
-          btn.classList.remove('bg-gray-100', 'ring-1', 'ring-[#141824]');
+          btn.classList.remove('bg-gray-100', 'dark:bg-white/10', 'ring-1', 'ring-[#141824]', 'dark:ring-white/40');
         }
       });
     }
@@ -968,9 +1157,9 @@ END:VCALENDAR`;
       document.querySelectorAll('.rating-btn').forEach(btn => {
         const r = parseInt(btn.getAttribute('data-rating'));
         if (r === rating) {
-          btn.className = 'rating-btn py-1.5 rounded-lg text-xs font-normal border tabular-nums bg-[#141824] text-white border-[#141824] shadow-sm';
+          btn.className = 'rating-btn py-1.5 rounded-lg text-xs font-normal border tabular-nums bg-[#141824] dark:bg-[#F25C19] text-white border-[#141824] dark:border-[#F25C19] shadow-sm';
         } else {
-          btn.className = 'rating-btn py-1.5 rounded-lg text-xs font-normal border tabular-nums bg-[#F5F5F7] text-[#1D1D1F] border-transparent hover:bg-gray-200';
+          btn.className = 'rating-btn py-1.5 rounded-lg text-xs font-normal border tabular-nums bg-[#F5F5F7] dark:bg-[#1C202E] text-[#1D1D1F] dark:text-[#F3F4F6] border-transparent hover:bg-gray-200 dark:hover:bg-white/10';
         }
       });
     }
@@ -978,10 +1167,15 @@ END:VCALENDAR`;
     function saveDailyEvaluation() {
       const note = document.getElementById('daily-note').value;
       const todayStr = getTodayStr();
+      const { score: taskScore } = getTodayTaskStats();
+      const ratingVal = currentSelectedRating || 7;
+      const combined = Math.round((taskScore * 0.6) + (ratingVal * 10 * 0.4));
 
       appState.evaluations[todayStr] = {
         mood: currentSelectedMood || 3,
-        rating: currentSelectedRating || 7,
+        rating: ratingVal,
+        taskScore: taskScore,
+        combinedScore: combined,
         note: note
       };
 
@@ -1019,12 +1213,9 @@ END:VCALENDAR`;
         const card = document.createElement('div');
         card.className = `${themeStyle} rounded-2xl p-4 shadow-sm flex flex-col justify-between space-y-3 relative overflow-hidden`;
 
-        // 35-day (7x5) Heatmap Grid
         let heatmapHTML = '<div class="grid grid-cols-7 gap-1 mt-2">';
         for (let i = 34; i >= 0; i--) {
-          const d = new Date();
-          d.setDate(d.getDate() - i);
-          const dStr = d.toISOString().split('T')[0];
+          const dStr = getDateStrDaysAgo(i);
           const active = !!checkIns[dStr];
           heatmapHTML += `<div class="aspect-square rounded-[3px] ${active ? 'bg-white/90' : 'bg-white/15'}" title="${dStr}"></div>`;
         }
@@ -1072,7 +1263,7 @@ END:VCALENDAR`;
     }
 
     // -------------------------------------------------------------
-    // ANALYSIS TAB (3 x 84-Day Heatmaps)
+    // ANALYSIS TAB (3 x 84-Day Heatmaps with Selected Day Highlight)
     // -------------------------------------------------------------
     function renderAnalysis() {
       renderSingleHeatmap('heatmap-task', 'orange');
@@ -1085,12 +1276,10 @@ END:VCALENDAR`;
       container.innerHTML = '';
 
       for (let i = 83; i >= 0; i--) {
-        const d = new Date();
-        d.setDate(d.getDate() - i);
-        const dStr = d.toISOString().split('T')[0];
+        const dStr = getDateStrDaysAgo(i);
         const evalData = appState.evaluations[dStr];
 
-        let intensityClass = 'bg-[#E5E5EA]/50';
+        let intensityClass = 'bg-[#E5E5EA]/50 dark:bg-[#232838]';
         if (evalData) {
           const score = evalData.rating || 5;
           if (colorType === 'orange') {
@@ -1108,14 +1297,20 @@ END:VCALENDAR`;
           }
         }
 
+        const isSelected = selectedAnalysisDate === dStr;
+        const selectedClass = isSelected
+          ? 'ring-2 ring-[#141824] dark:ring-white ring-offset-1 ring-offset-white dark:ring-offset-[#161923] z-10'
+          : '';
+
         const cell = document.createElement('button');
-        cell.className = `aspect-square rounded-[4px] ${intensityClass} transition-transform active:scale-95`;
+        cell.className = `aspect-square rounded-[4px] ${intensityClass} ${selectedClass} transition-transform active:scale-95`;
         cell.onclick = () => selectAnalysisDay(dStr, evalData);
         container.appendChild(cell);
       }
     }
 
     function selectAnalysisDay(dateStr, evalData) {
+      selectedAnalysisDate = dateStr;
       document.getElementById('analysis-detail-date').textContent = dateStr;
       if (evalData) {
         document.getElementById('analysis-detail-score').textContent = `Moral: ${evalData.rating}/10`;
@@ -1124,6 +1319,7 @@ END:VCALENDAR`;
         document.getElementById('analysis-detail-score').textContent = 'Kayıt Yok';
         document.getElementById('analysis-detail-note').textContent = 'Bu tarihe ait veri kaydı bulunmuyor.';
       }
+      renderAnalysis();
     }
 
     // -------------------------------------------------------------
@@ -1144,7 +1340,6 @@ END:VCALENDAR`;
         const completed = milestones.filter(m => m.done).length;
         const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
 
-        // Calculate days remaining
         let daysLeftText = '';
         if (g.targetDate) {
           const diffMs = new Date(g.targetDate) - new Date();
@@ -1153,14 +1348,14 @@ END:VCALENDAR`;
         }
 
         const card = document.createElement('div');
-        card.className = 'bg-white rounded-2xl p-4 shadow-sm border border-black/[0.03] space-y-3';
+        card.className = 'bg-white dark:bg-[#161923] rounded-2xl p-4 shadow-sm border border-black/[0.03] dark:border-white/[0.06] space-y-3';
 
         let milestonesHTML = '';
         milestones.forEach(m => {
           milestonesHTML += `
-            <div class="flex items-center justify-between text-xs py-1 border-b border-gray-50 last:border-none">
-              <span class="${m.done ? 'line-through text-[#8E8E93]' : 'text-[#1D1D1F]'}">${escapeHtml(m.text)}</span>
-              <button onclick="toggleMilestone('${g.id}', '${m.id}')" class="w-4 h-4 rounded border flex items-center justify-center ${m.done ? 'bg-[#141824] border-[#141824] text-white' : 'border-[#D1D1D6]'}">
+            <div class="flex items-center justify-between text-xs py-1 border-b border-gray-50 dark:border-white/[0.05] last:border-none">
+              <span class="${m.done ? 'line-through text-[#8E8E93]' : 'text-[#1D1D1F] dark:text-[#F3F4F6]'}">${escapeHtml(m.text)}</span>
+              <button onclick="toggleMilestone('${g.id}', '${m.id}')" class="w-4 h-4 rounded border flex items-center justify-center ${m.done ? 'bg-[#141824] dark:bg-[#F25C19] border-[#141824] dark:border-[#F25C19] text-white' : 'border-[#D1D1D6] dark:border-white/20'}">
                 ${m.done ? '✓' : ''}
               </button>
             </div>
@@ -1170,7 +1365,7 @@ END:VCALENDAR`;
         card.innerHTML = `
           <div class="flex items-center justify-between">
             <div>
-              <h3 class="text-sm font-medium text-[#1D1D1F]">${escapeHtml(g.title)}</h3>
+              <h3 class="text-sm font-medium text-[#1D1D1F] dark:text-[#F3F4F6]">${escapeHtml(g.title)}</h3>
               ${daysLeftText ? `<span class="text-[10px] text-[#F25C19] font-normal tabular-nums">${daysLeftText}</span>` : ''}
             </div>
             <button onclick="deleteGoal('${g.id}')" class="text-[#8E8E93] hover:text-[#FF3B30]">
@@ -1178,14 +1373,13 @@ END:VCALENDAR`;
             </button>
           </div>
 
-          <!-- Progress Bar -->
           <div class="space-y-1">
             <div class="flex items-center justify-between text-[11px] text-[#8E8E93] tabular-nums">
               <span>İlerleme</span>
               <span>${pct}%</span>
             </div>
-            <div class="w-full h-2 bg-[#F5F5F7] rounded-full overflow-hidden">
-              <div class="h-full bg-[#141824] rounded-full transition-all duration-300" style="width: ${pct}%"></div>
+            <div class="w-full h-2 bg-[#F5F5F7] dark:bg-[#232838] rounded-full overflow-hidden">
+              <div class="h-full bg-[#141824] dark:bg-[#F25C19] rounded-full transition-all duration-300" style="width: ${pct}%"></div>
             </div>
           </div>
 
@@ -1222,6 +1416,7 @@ END:VCALENDAR`;
     function openAddGoalModal() { document.getElementById('modal-goal').classList.remove('hidden'); }
     function openSettingsModal() {
       updateNotificationUI();
+      applyTheme();
       document.getElementById('modal-settings').classList.remove('hidden');
     }
 
@@ -1300,7 +1495,7 @@ END:VCALENDAR`;
       if (badge) {
         if (!('Notification' in window)) {
           badge.textContent = 'Desteklenmiyor';
-          badge.className = 'text-[10px] px-2 py-0.5 rounded-full bg-[#E5E5EA] text-[#545456]';
+          badge.className = 'text-[10px] px-2 py-0.5 rounded-full bg-[#E5E5EA] dark:bg-[#232838] text-[#545456] dark:text-[#D1D5DB]';
         } else if (Notification.permission === 'granted') {
           badge.textContent = 'Açık';
           badge.className = 'text-[10px] px-2 py-0.5 rounded-full bg-[#34C759]/15 text-[#34C759]';
@@ -1318,17 +1513,17 @@ END:VCALENDAR`;
       const dot = document.getElementById('toggle-sound-dot');
       if (btn && dot) {
         if (soundEnabled) {
-          btn.className = 'w-10 h-5 rounded-full bg-[#141824] relative transition-colors';
+          btn.className = 'w-10 h-5 rounded-full bg-[#141824] dark:bg-[#F25C19] relative transition-colors';
           dot.className = 'w-4 h-4 rounded-full bg-white absolute top-0.5 right-0.5 transition-all';
         } else {
-          btn.className = 'w-10 h-5 rounded-full bg-[#D1D1D6] relative transition-colors';
+          btn.className = 'w-10 h-5 rounded-full bg-[#D1D1D6] dark:bg-[#232838] relative transition-colors';
           dot.className = 'w-4 h-4 rounded-full bg-white absolute top-0.5 left-0.5 transition-all';
         }
       }
     }
 
     function toggleSoundSetting() {
-      if (!appState.settings) appState.settings = { soundEnabled: true };
+      if (!appState.settings) appState.settings = { soundEnabled: true, darkMode: false };
       appState.settings.soundEnabled = !appState.settings.soundEnabled;
       saveState();
       updateNotificationUI();
@@ -1386,7 +1581,8 @@ END:VCALENDAR`;
           const imported = JSON.parse(e.target.result);
           if (imported && typeof imported === 'object') {
             appState = imported;
-            if (!appState.settings) appState.settings = { soundEnabled: true };
+            if (!appState.settings) appState.settings = { soundEnabled: true, darkMode: false };
+            applyTheme();
             saveState();
             closeModal('modal-settings');
             showToast('Yedek başarıyla yüklendi');
@@ -1398,12 +1594,13 @@ END:VCALENDAR`;
       reader.readAsText(file);
     }
 
-    // True Factory Reset (saves empty state with initialized: true so demo data never reloads)
     function performFactoryReset() {
+      const keepDark = !!appState.settings?.darkMode;
+      selectedAnalysisDate = null;
       appState = {
         initialized: true,
         user: { name: 'Burak' },
-        settings: { soundEnabled: true },
+        settings: { soundEnabled: true, darkMode: keepDark },
         tasks: [],
         habits: [],
         goals: [],
@@ -1415,7 +1612,7 @@ END:VCALENDAR`;
     }
 
     // -------------------------------------------------------------
-    // AUDIO CHIME & TIME SCHEDULER NOTIFICATIONS
+    // AUDIO CHIME & TIME SCHEDULER (Includes Daily 23:30 Reminder)
     // -------------------------------------------------------------
     function playSoftChime() {
       try {
@@ -1426,8 +1623,8 @@ END:VCALENDAR`;
         const gain = ctx.createGain();
 
         osc.type = 'sine';
-        osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5 note
-        osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.3); // A5 note
+        osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.3);
 
         gain.gain.setValueAtTime(0.15, ctx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
@@ -1443,41 +1640,51 @@ END:VCALENDAR`;
     function checkScheduledTasks() {
       const now = new Date();
       const currentHHMM = now.toTimeString().slice(0, 5);
+      const todayStr = getTodayStr();
 
+      // Scheduled manual tasks
       appState.tasks.forEach(t => {
-        if (t.time === currentHHMM && !t.notifiedToday) {
-          if (appState.settings?.soundEnabled !== false) {
-            playSoftChime();
-          }
+        if (t.time === currentHHMM && t.lastNotifiedDate !== todayStr) {
+          if (appState.settings?.soundEnabled !== false) playSoftChime();
           showToast(`Hatırlatıcı: ${t.title}`);
-          t.notifiedToday = true;
+          t.lastNotifiedDate = todayStr;
 
           if ("Notification" in window && Notification.permission === "granted") {
             new Notification("Günlük Takip", { body: t.title });
           }
         }
       });
-    }
-    setInterval(checkScheduledTasks, 30000); // Check every 30s
 
-    // Helper: Toast Message
+      // Daily 23:30 End-of-Day Evaluation Reminder
+      if (currentHHMM === '23:30') {
+        const lastEvalNotif = localStorage.getItem('last_eval_notif_date');
+        if (lastEvalNotif !== todayStr) {
+          localStorage.setItem('last_eval_notif_date', todayStr);
+          if (appState.settings?.soundEnabled !== false) playSoftChime();
+          showToast('Gün sonu değerlendirmeni yapmayı unutma!');
+          if ("Notification" in window && Notification.permission === "granted") {
+            new Notification("Gün Sonu Değerlendirme", { body: "Bugünü puanlamayı ve kısa bir not bırakmayı unutma." });
+          }
+        }
+      }
+    }
+    setInterval(checkScheduledTasks, 30000);
+
+    let toastTimer = null;
     function showToast(msg) {
       const toast = document.getElementById('toast');
       document.getElementById('toast-message').textContent = msg;
       toast.classList.remove('opacity-0', 'pointer-events-none');
-      setTimeout(() => {
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
         toast.classList.add('opacity-0', 'pointer-events-none');
-      }, 2500);
+      }, 2200);
     }
 
-    // Helper: HTML Escaping
     function escapeHtml(str) {
       return String(str).replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>').replace(/"/g, '"');
     }
 
-    // -------------------------------------------------------------
-    // RENDER ALL UI VIEWS
-    // -------------------------------------------------------------
     function renderApp() {
       updateHeader();
       renderDashboard();
@@ -1486,7 +1693,6 @@ END:VCALENDAR`;
       renderGoals();
     }
 
-    // App Initialization
     window.onload = function() {
       registerServiceWorker();
       loadState();
