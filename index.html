@@ -86,9 +86,40 @@
       background-color: #141824;
       pointer-events: none;
     }
+    .drag-handle {
+      touch-action: none;
+      cursor: grab;
+    }
+    .drag-handle:active {
+      cursor: grabbing;
+    }
+    .habit-dragging {
+      opacity: 0.85;
+      transform: scale(1.02);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+      z-index: 30;
+      position: relative;
+    }
   </style>
 </head>
 <body class="h-full flex flex-col antialiased bg-[#F5F5F7] dark:bg-[#0B0D14] text-[#1D1D1F] dark:text-[#F3F4F6] font-normal transition-colors duration-200">
+
+  <!-- Confetti Canvas -->
+  <canvas id="confetti-canvas" class="fixed inset-0 w-full h-full pointer-events-none z-[60] hidden"></canvas>
+
+  <!-- Celebration Modal -->
+  <div id="modal-celebration" onclick="closeCelebration()" class="fixed inset-0 bg-black/35 backdrop-blur-sm z-[55] flex items-center justify-center p-6 hidden">
+    <div onclick="event.stopPropagation()" class="bg-white dark:bg-[#161923] w-full max-w-xs rounded-3xl p-7 shadow-2xl border border-black/[0.04] dark:border-white/[0.08] text-center space-y-2.5">
+      <div class="w-12 h-12 rounded-2xl bg-[#F25C19]/15 text-[#F25C19] flex items-center justify-center mx-auto mb-3">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+      </div>
+      <h3 id="celebration-title" class="text-xl font-medium tracking-tight text-[#1D1D1F] dark:text-[#F3F4F6]">Tebrikler</h3>
+      <p class="text-xs font-light text-[#6E6E73] dark:text-[#9CA3AF]">Bugünkü bütün görevlerini bitirdin</p>
+      <button onclick="closeCelebration()" class="mt-4 w-full py-2.5 rounded-xl bg-[#141824] dark:bg-[#F25C19] text-white text-xs font-normal active:opacity-90 transition-opacity">
+        Harika
+      </button>
+    </div>
+  </div>
 
   <!-- Main Scrollable App Container -->
   <main id="app-container" class="flex-1 overflow-y-auto no-scrollbar w-full max-w-lg mx-auto px-4 pt-[calc(env(safe-area-inset-top)+28px)] pb-[calc(env(safe-area-inset-bottom)+110px)]">
@@ -178,9 +209,7 @@
           <h2 class="text-xs font-normal text-[#1D1D1F] dark:text-[#F3F4F6]">Haftalık Performans</h2>
           <span class="text-[11px] font-normal text-[#8E8E93]">Son 7 Gün</span>
         </div>
-        <div id="weekly-bars-container" class="grid grid-cols-7 gap-2 items-end h-28 pt-2">
-          <!-- Rendered dynamically via JavaScript -->
-        </div>
+        <div id="weekly-bars-container" class="grid grid-cols-7 gap-2 items-end h-28 pt-2"></div>
       </div>
 
       <!-- Günlük Görevler Container (Includes Habits + Daily Tasks) -->
@@ -196,12 +225,10 @@
           </button>
         </div>
 
-        <div id="tasks-list" class="space-y-2">
-          <!-- Habits + Manual Tasks rendered dynamically -->
-        </div>
+        <div id="tasks-list" class="space-y-2"></div>
       </div>
 
-      <!-- Yaklaşan Hedefler (Dashboard Goals Summary) -->
+      <!-- Yaklaşan Hedefler -->
       <div id="dash-goals-section" class="bg-white dark:bg-[#161923] rounded-2xl p-4 shadow-sm border border-black/[0.03] dark:border-white/[0.06] space-y-3">
         <div class="flex items-center justify-between">
           <div>
@@ -210,17 +237,15 @@
           </div>
           <button onclick="switchTab('goals')" class="text-[11px] font-normal text-[#F25C19]">Tümünü Gör</button>
         </div>
-        <div id="dash-goals-list" class="space-y-2">
-          <!-- Rendered dynamically -->
-        </div>
+        <div id="dash-goals-list" class="space-y-2"></div>
       </div>
 
-      <!-- Gün Sonu Değerlendirme (Always at bottom of Dashboard) -->
+      <!-- Gün Sonu Değerlendirme (With Photo Support) -->
       <div class="bg-white dark:bg-[#161923] rounded-2xl p-4 shadow-sm border border-black/[0.03] dark:border-white/[0.06] space-y-4">
         <div class="flex items-center justify-between">
           <div>
             <h2 class="text-sm font-medium text-[#1D1D1F] dark:text-[#F3F4F6]">Gün Sonu Değerlendirme</h2>
-            <p class="text-[11px] font-normal text-[#8E8E93]">Bugünkü modunu ve notunu kaydet</p>
+            <p class="text-[11px] font-normal text-[#8E8E93]">Bugünkü modunu, notunu ve fotoğrafını kaydet</p>
           </div>
           <span class="text-[10px] text-[#8E8E93] tabular-nums">Her gün 23:30</span>
         </div>
@@ -285,6 +310,24 @@
           <textarea id="daily-note" rows="2" placeholder="Bugün neler yaşandı, ne hissediyorsun?" class="w-full text-xs p-3 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[#1D1D1F] dark:text-[#F3F4F6] border border-black/[0.04] dark:border-white/[0.08] focus:outline-none focus:ring-1 focus:ring-[#141824] dark:focus:ring-white/30 transition-all resize-none"></textarea>
         </div>
 
+        <!-- Daily Photo Upload -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <label class="text-xs font-normal text-[#8E8E93]">Günün Fotoğrafı (Opsiyonel)</label>
+            <button type="button" onclick="document.getElementById('daily-photo-input').click()" class="text-[11px] font-normal text-[#F25C19] flex items-center gap-1">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="3"/></svg>
+              <span>Fotoğraf Seç</span>
+            </button>
+            <input type="file" id="daily-photo-input" accept="image/*" class="hidden" onchange="handleDailyPhotoSelect(event)">
+          </div>
+          <div id="daily-photo-preview-wrap" class="relative hidden rounded-xl overflow-hidden border border-black/[0.06] dark:border-white/[0.08]">
+            <img id="daily-photo-preview" src="" alt="Günün Fotoğrafı" class="w-full max-h-48 object-cover">
+            <button type="button" onclick="removeDailyPhoto()" class="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/60 text-white flex items-center justify-center backdrop-blur-sm" aria-label="Fotoğrafı Kaldır">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+          </div>
+        </div>
+
         <button onclick="saveDailyEvaluation()" class="w-full py-2.5 rounded-xl bg-[#141824] dark:bg-[#F25C19] active:bg-[#2C3246] text-white text-xs font-medium transition-colors shadow-sm">
           Kaydet
         </button>
@@ -292,12 +335,12 @@
 
     </div>
 
-    <!-- TAB 2: ALIŞKANLIKLAR (Clean Add / Remove Management Only) -->
+    <!-- TAB 2: ALIŞKANLIKLAR (Edit + Drag-and-Drop Reorder + Add/Remove) -->
     <div id="tab-habits" class="tab-content hidden space-y-4">
       <div class="flex items-center justify-between mb-2">
         <div>
           <h2 class="text-lg font-medium text-[#1D1D1F] dark:text-[#F3F4F6]">Alışkanlıklar</h2>
-          <p class="text-xs font-normal text-[#8E8E93]">Günlük rutinlerini ekle veya kaldır</p>
+          <p class="text-xs font-normal text-[#8E8E93]">Sürükleyerek sırala, düzenle veya yeni ekle</p>
         </div>
         <button onclick="openAddHabitModal()" class="px-3 py-1.5 rounded-xl bg-[#141824] dark:bg-[#F25C19] active:bg-[#2C3246] text-white text-xs font-normal flex items-center gap-1.5 transition-colors shadow-sm">
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>
@@ -305,9 +348,7 @@
         </button>
       </div>
 
-      <div id="habits-grid" class="space-y-2.5">
-        <!-- Rendered dynamically -->
-      </div>
+      <div id="habits-grid" class="space-y-2.5"></div>
     </div>
 
     <!-- TAB 3: HEDEFLER -->
@@ -323,12 +364,10 @@
         </button>
       </div>
 
-      <div id="goals-list" class="space-y-3">
-        <!-- Rendered dynamically -->
-      </div>
+      <div id="goals-list" class="space-y-3"></div>
     </div>
 
-    <!-- TAB 4: ANALİZ (Date Ranges + Main Heatmaps + Habit Heatmaps) -->
+    <!-- TAB 4: ANALİZ -->
     <div id="tab-analysis" class="tab-content hidden space-y-4">
       <div>
         <h2 class="text-lg font-medium text-[#1D1D1F] dark:text-[#F3F4F6]">Analiz</h2>
@@ -346,33 +385,36 @@
           <button onclick="setAnalysisRange('custom')" data-range="custom" class="range-btn py-1.5 rounded-lg text-[11px] font-normal transition-all">Özel</button>
         </div>
 
-        <!-- Custom Date Range Inputs -->
+        <!-- Custom Date Range Inputs (Validated) -->
         <div id="custom-range-box" class="hidden bg-white dark:bg-[#161923] rounded-xl p-3 border border-black/[0.04] dark:border-white/[0.06] grid grid-cols-2 gap-2 text-xs">
           <div>
             <label class="block text-[10px] text-[#8E8E93] mb-1">Başlangıç</label>
-            <input id="custom-date-start" type="date" onchange="onCustomDateChange()" class="w-full p-2 rounded-lg bg-[#F5F5F7] dark:bg-[#1C202E] text-[#1D1D1F] dark:text-[#F3F4F6] border border-black/[0.04] dark:border-white/[0.08] text-[11px] tabular-nums">
+            <input id="custom-date-start" type="date" onchange="onCustomDateChange('start')" class="w-full p-2 rounded-lg bg-[#F5F5F7] dark:bg-[#1C202E] text-[#1D1D1F] dark:text-[#F3F4F6] border border-black/[0.04] dark:border-white/[0.08] text-[11px] tabular-nums">
           </div>
           <div>
             <label class="block text-[10px] text-[#8E8E93] mb-1">Bitiş</label>
-            <input id="custom-date-end" type="date" onchange="onCustomDateChange()" class="w-full p-2 rounded-lg bg-[#F5F5F7] dark:bg-[#1C202E] text-[#1D1D1F] dark:text-[#F3F4F6] border border-black/[0.04] dark:border-white/[0.08] text-[11px] tabular-nums">
+            <input id="custom-date-end" type="date" onchange="onCustomDateChange('end')" class="w-full p-2 rounded-lg bg-[#F5F5F7] dark:bg-[#1C202E] text-[#1D1D1F] dark:text-[#F3F4F6] border border-black/[0.04] dark:border-white/[0.08] text-[11px] tabular-nums">
           </div>
         </div>
       </div>
 
-      <!-- Selected Day Summary Card -->
-      <div id="analysis-detail-card" class="bg-white dark:bg-[#161923] rounded-2xl p-4 shadow-sm border border-black/[0.03] dark:border-white/[0.06] space-y-2">
+      <!-- Selected Day Summary Card (Now displays saved photo too) -->
+      <div id="analysis-detail-card" class="bg-white dark:bg-[#161923] rounded-2xl p-4 shadow-sm border border-black/[0.03] dark:border-white/[0.06] space-y-2.5">
         <div class="flex items-center justify-between">
           <span id="analysis-detail-date" class="text-xs font-medium text-[#1D1D1F] dark:text-[#F3F4F6] tabular-nums">Bir gün seçin</span>
           <span id="analysis-detail-score" class="text-xs font-medium text-[#F25C19] tabular-nums">-</span>
         </div>
         <p id="analysis-detail-note" class="text-xs text-[#6E6E73] dark:text-[#9CA3AF] italic">Isı haritasındaki herhangi bir güne tıklayarak detayları görüntüleyebilirsiniz.</p>
+        <div id="analysis-detail-photo-wrap" class="hidden pt-1">
+          <img id="analysis-detail-photo" src="" alt="Gün Fotoğrafı" class="w-full max-h-56 object-cover rounded-xl border border-black/[0.05] dark:border-white/[0.08]">
+        </div>
       </div>
 
       <!-- Main Heatmaps -->
       <div class="bg-white dark:bg-[#161923] rounded-2xl p-4 shadow-sm border border-black/[0.03] dark:border-white/[0.06] space-y-3">
         <div class="flex items-center justify-between">
           <span class="text-xs font-normal text-[#1D1D1F] dark:text-[#F3F4F6]">Görev Puanı</span>
-          <span class="text-[10px] text-[#8E8E93] analysis-days-label">Turuncu Isı Haritası</span>
+          <span class="text-[10px] text-[#8E8E93]">Turuncu Isı Haritası</span>
         </div>
         <div id="heatmap-task"></div>
       </div>
@@ -380,7 +422,7 @@
       <div class="bg-white dark:bg-[#161923] rounded-2xl p-4 shadow-sm border border-black/[0.03] dark:border-white/[0.06] space-y-3">
         <div class="flex items-center justify-between">
           <span class="text-xs font-normal text-[#1D1D1F] dark:text-[#F3F4F6]">Gün & Moral Puanı</span>
-          <span class="text-[10px] text-[#8E8E93] analysis-days-label">İndigo Isı Haritası</span>
+          <span class="text-[10px] text-[#8E8E93]">İndigo Isı Haritası</span>
         </div>
         <div id="heatmap-mood"></div>
       </div>
@@ -388,7 +430,7 @@
       <div class="bg-white dark:bg-[#161923] rounded-2xl p-4 shadow-sm border border-black/[0.03] dark:border-white/[0.06] space-y-3">
         <div class="flex items-center justify-between">
           <span class="text-xs font-normal text-[#1D1D1F] dark:text-[#F3F4F6]">Birleşik Skor</span>
-          <span class="text-[10px] text-[#8E8E93] analysis-days-label">Zümrüt Isı Haritası</span>
+          <span class="text-[10px] text-[#8E8E93]">Zümrüt Isı Haritası</span>
         </div>
         <div id="heatmap-combined"></div>
       </div>
@@ -399,9 +441,7 @@
           <h3 class="text-sm font-medium text-[#1D1D1F] dark:text-[#F3F4F6]">Alışkanlık Isı Haritaları</h3>
           <span id="analysis-habits-count" class="text-[11px] text-[#8E8E93] tabular-nums"></span>
         </div>
-        <div id="analysis-habits-heatmaps" class="space-y-3">
-          <!-- Rendered dynamically -->
-        </div>
+        <div id="analysis-habits-heatmaps" class="space-y-3"></div>
       </div>
     </div>
 
@@ -494,11 +534,11 @@
     </div>
   </div>
 
-  <!-- Add Habit Modal (Now with Optional Reminder Time) -->
+  <!-- Add / Edit Habit Modal -->
   <div id="modal-habit" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
     <div class="bg-white dark:bg-[#161923] w-full max-w-md rounded-t-2xl sm:rounded-2xl p-5 space-y-4">
       <div class="flex items-center justify-between border-b border-black/[0.06] dark:border-white/[0.08] pb-3">
-        <h3 class="text-sm font-medium text-[#1D1D1F] dark:text-[#F3F4F6]">Yeni Alışkanlık Ekle</h3>
+        <h3 id="modal-habit-title" class="text-sm font-medium text-[#1D1D1F] dark:text-[#F3F4F6]">Yeni Alışkanlık Ekle</h3>
         <button onclick="closeModal('modal-habit')" class="text-[#8E8E93]">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
@@ -643,9 +683,11 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
   <script>
     const STORAGE_KEY = 'gunluk_takip_pwa_v2';
     let selectedAnalysisDate = null;
-    let analysisRange = '3m'; // '1w' | '1m' | '3m' | '6m' | '1y' | 'custom'
+    let analysisRange = '3m';
     let customStartDate = '';
     let customEndDate = '';
+    let editingHabitId = null;
+    let pendingDailyPhoto = null;
 
     let appState = {
       initialized: false,
@@ -748,8 +790,83 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
     }
 
     function saveState() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+      } catch (e) {
+        showToast('Hafıza dolu, fotoğraf kaydedilemedi');
+      }
       renderApp();
+    }
+
+    // -------------------------------------------------------------
+    // CONFETTI & CELEBRATION
+    // -------------------------------------------------------------
+    function triggerCelebration() {
+      const name = appState.user?.name?.trim();
+      document.getElementById('celebration-title').textContent = name ? `Tebrikler, ${name}` : 'Tebrikler';
+      document.getElementById('modal-celebration').classList.remove('hidden');
+      if (appState.settings?.soundEnabled !== false) playSoftChime();
+      launchConfetti();
+    }
+
+    function closeCelebration() {
+      document.getElementById('modal-celebration').classList.add('hidden');
+    }
+
+    function launchConfetti() {
+      const canvas = document.getElementById('confetti-canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      canvas.classList.remove('hidden');
+
+      const colors = ['#F25C19', '#FFCC00', '#34C759', '#5E5CE6', '#30B0C7', '#EC4899'];
+      const particles = [];
+      for (let i = 0; i < 110; i++) {
+        particles.push({
+          x: canvas.width / 2 + (Math.random() - 0.5) * 140,
+          y: canvas.height * 0.45 + (Math.random() - 0.5) * 80,
+          vx: (Math.random() - 0.5) * 14,
+          vy: (Math.random() - 1.1) * 14 - 2,
+          size: Math.random() * 6 + 4,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          rot: Math.random() * 360,
+          vRot: (Math.random() - 0.5) * 12,
+          alpha: 1
+        });
+      }
+
+      let frame = 0;
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let active = false;
+        particles.forEach(p => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += 0.35;
+          p.vx *= 0.99;
+          p.rot += p.vRot;
+          if (frame > 70) p.alpha -= 0.02;
+          if (p.alpha > 0 && p.y < canvas.height + 20) {
+            active = true;
+            ctx.save();
+            ctx.globalAlpha = Math.max(0, p.alpha);
+            ctx.translate(p.x, p.y);
+            ctx.rotate((p.rot * Math.PI) / 180);
+            ctx.fillStyle = p.color;
+            ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
+            ctx.restore();
+          }
+        });
+        frame++;
+        if (active && frame < 160) {
+          requestAnimationFrame(animate);
+        } else {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          canvas.classList.add('hidden');
+        }
+      }
+      requestAnimationFrame(animate);
     }
 
     // -------------------------------------------------------------
@@ -857,7 +974,7 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
     function registerServiceWorker() {
       if ('serviceWorker' in navigator) {
         const swCode = `
-          const CACHE_NAME = 'gunluk-takip-v5';
+          const CACHE_NAME = 'gunluk-takip-v6';
           self.addEventListener('install', e => {
             e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(['./index.html'])));
             self.skipWaiting();
@@ -982,12 +1099,16 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
         selectMood(todayEval.mood, false);
         selectRating(todayEval.rating, false);
         document.getElementById('daily-note').value = todayEval.note || '';
+        if (pendingDailyPhoto === null && todayEval.photo) {
+          pendingDailyPhoto = todayEval.photo;
+        }
       } else {
         currentSelectedMood = null;
         currentSelectedRating = null;
         document.getElementById('daily-note').value = '';
         document.querySelectorAll('.mood-btn').forEach(btn => btn.classList.remove('bg-gray-100', 'dark:bg-white/10', 'ring-1', 'ring-[#141824]', 'dark:ring-white/40'));
       }
+      updateDailyPhotoPreview();
     }
 
     function renderWeeklyBars() {
@@ -1152,11 +1273,22 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
       });
     }
 
+    function checkAllCompletedAndCelebrate(wasAllDone) {
+      const stats = getTodayTaskStats();
+      if (!wasAllDone && stats.totalCount > 0 && stats.completedCount === stats.totalCount) {
+        triggerCelebration();
+      }
+    }
+
     function toggleTask(id) {
+      const before = getTodayTaskStats();
+      const wasAllDone = before.totalCount > 0 && before.completedCount === before.totalCount;
+
       const task = appState.tasks.find(t => t.id === id);
       if (task) {
         task.completed = !task.completed;
         saveState();
+        checkAllCompletedAndCelebrate(wasAllDone);
       }
     }
 
@@ -1207,7 +1339,7 @@ END:VCALENDAR`;
     }
 
     // -------------------------------------------------------------
-    // MOOD & RATING EVALUATION
+    // MOOD, RATING & PHOTO EVALUATION
     // -------------------------------------------------------------
     function renderRatingButtons() {
       const container = document.getElementById('rating-selector');
@@ -1246,6 +1378,57 @@ END:VCALENDAR`;
       });
     }
 
+    function handleDailyPhotoSelect(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const maxDim = 640;
+          let w = img.width;
+          let h = img.height;
+          if (w > maxDim || h > maxDim) {
+            if (w > h) {
+              h = Math.round((h * maxDim) / w);
+              w = maxDim;
+            } else {
+              w = Math.round((w * maxDim) / h);
+              h = maxDim;
+            }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          pendingDailyPhoto = canvas.toDataURL('image/jpeg', 0.68);
+          updateDailyPhotoPreview();
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+      event.target.value = '';
+    }
+
+    function updateDailyPhotoPreview() {
+      const wrap = document.getElementById('daily-photo-preview-wrap');
+      const img = document.getElementById('daily-photo-preview');
+      if (pendingDailyPhoto) {
+        img.src = pendingDailyPhoto;
+        wrap.classList.remove('hidden');
+      } else {
+        img.src = '';
+        wrap.classList.add('hidden');
+      }
+    }
+
+    function removeDailyPhoto() {
+      pendingDailyPhoto = '';
+      updateDailyPhotoPreview();
+    }
+
     function saveDailyEvaluation() {
       const note = document.getElementById('daily-note').value;
       const todayStr = getTodayStr();
@@ -1258,7 +1441,8 @@ END:VCALENDAR`;
         rating: ratingVal,
         taskScore: taskScore,
         combinedScore: combined,
-        note: note
+        note: note,
+        photo: pendingDailyPhoto || ''
       };
 
       saveState();
@@ -1266,7 +1450,7 @@ END:VCALENDAR`;
     }
 
     // -------------------------------------------------------------
-    // HABITS TAB (Clean Add / Remove Only)
+    // HABITS TAB (Edit + Drag-and-Drop Reorder + Delete)
     // -------------------------------------------------------------
     const HABIT_DOT_COLORS = {
       navy: 'bg-[#141824] dark:bg-[#60A5FA]',
@@ -1293,15 +1477,24 @@ END:VCALENDAR`;
         return;
       }
 
-      appState.habits.forEach(h => {
+      appState.habits.forEach((h, idx) => {
         const dotColor = HABIT_DOT_COLORS[h.theme] || HABIT_DOT_COLORS.navy;
         const count = Object.keys(h.checkIns || {}).length;
 
         const card = document.createElement('div');
-        card.className = 'bg-white dark:bg-[#161923] rounded-2xl p-4 shadow-sm border border-black/[0.03] dark:border-white/[0.06] flex items-center justify-between';
+        card.setAttribute('data-habit-index', idx);
+        card.setAttribute('data-habit-id', h.id);
+        card.className = 'habit-card bg-white dark:bg-[#161923] rounded-2xl p-3.5 shadow-sm border border-black/[0.03] dark:border-white/[0.06] flex items-center justify-between transition-transform';
 
         card.innerHTML = `
-          <div class="flex items-center gap-3 min-w-0">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <div class="drag-handle p-1.5 text-[#8E8E93] hover:text-[#1D1D1F] dark:hover:text-white shrink-0" title="Sürükleyerek Sırala">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                <circle cx="9" cy="6" r="1.5"/><circle cx="15" cy="6" r="1.5"/>
+                <circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/>
+                <circle cx="9" cy="18" r="1.5"/><circle cx="15" cy="18" r="1.5"/>
+              </svg>
+            </div>
             <span class="w-3 h-3 rounded-full shrink-0 ${dotColor}"></span>
             <div class="min-w-0">
               <p class="text-xs font-medium text-[#1D1D1F] dark:text-[#F3F4F6] truncate">${escapeHtml(h.title)}</p>
@@ -1311,15 +1504,95 @@ END:VCALENDAR`;
               </div>
             </div>
           </div>
-          <button onclick="deleteHabit('${h.id}')" class="p-2 text-[#8E8E93] hover:text-[#FF3B30] transition-colors shrink-0" title="Alışkanlığı Sil">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-          </button>
+          <div class="flex items-center gap-0.5 shrink-0">
+            <button onclick="openEditHabitModal('${h.id}')" class="p-2 text-[#8E8E93] hover:text-[#1D1D1F] dark:hover:text-white transition-colors" title="Düzenle">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path stroke-linecap="round" stroke-linejoin="round" d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </button>
+            <button onclick="deleteHabit('${h.id}')" class="p-2 text-[#8E8E93] hover:text-[#FF3B30] transition-colors" title="Alışkanlığı Sil">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            </button>
+          </div>
         `;
+
+        const handle = card.querySelector('.drag-handle');
+        handle.addEventListener('pointerdown', e => startHabitDrag(e, card));
+
         container.appendChild(card);
       });
     }
 
+    // Pointer-based Drag & Drop (Works on iOS Touch + Desktop Mouse)
+    let dragState = null;
+
+    function startHabitDrag(e, card) {
+      e.preventDefault();
+      const container = document.getElementById('habits-grid');
+      const cards = Array.from(container.querySelectorAll('.habit-card'));
+      const startIndex = cards.indexOf(card);
+      if (startIndex === -1) return;
+
+      card.classList.add('habit-dragging');
+      dragState = {
+        card,
+        container,
+        startY: e.clientY,
+        currentIndex: startIndex
+      };
+
+      window.addEventListener('pointermove', onHabitDragMove, { passive: false });
+      window.addEventListener('pointerup', onHabitDragEnd);
+      window.addEventListener('pointercancel', onHabitDragEnd);
+    }
+
+    function onHabitDragMove(e) {
+      if (!dragState) return;
+      e.preventDefault();
+
+      const { card, container } = dragState;
+      const cards = Array.from(container.querySelectorAll('.habit-card'));
+      const y = e.clientY;
+
+      for (let i = 0; i < cards.length; i++) {
+        const target = cards[i];
+        if (target === card) continue;
+        const rect = target.getBoundingClientRect();
+        const midY = rect.top + rect.height / 2;
+        const cardIdx = cards.indexOf(card);
+
+        if (i < cardIdx && y < midY) {
+          container.insertBefore(card, target);
+          dragState.currentIndex = i;
+          break;
+        } else if (i > cardIdx && y > midY) {
+          container.insertBefore(card, target.nextSibling);
+          dragState.currentIndex = i;
+          break;
+        }
+      }
+    }
+
+    function onHabitDragEnd() {
+      if (!dragState) return;
+      const { card, container } = dragState;
+      card.classList.remove('habit-dragging');
+
+      const newOrderIds = Array.from(container.querySelectorAll('.habit-card')).map(c => c.getAttribute('data-habit-id'));
+      const habitMap = {};
+      appState.habits.forEach(h => { habitMap[h.id] = h; });
+      appState.habits = newOrderIds.map(id => habitMap[id]).filter(Boolean);
+
+      window.removeEventListener('pointermove', onHabitDragMove);
+      window.removeEventListener('pointerup', onHabitDragEnd);
+      window.removeEventListener('pointercancel', onHabitDragEnd);
+      dragState = null;
+
+      saveState();
+    }
+
     function toggleHabitCheckIn(id) {
+      const before = getTodayTaskStats();
+      const wasAllDone = before.totalCount > 0 && before.completedCount === before.totalCount;
+
       const habit = appState.habits.find(h => h.id === id);
       if (habit) {
         if (!habit.checkIns) habit.checkIns = {};
@@ -1330,6 +1603,7 @@ END:VCALENDAR`;
           habit.checkIns[todayStr] = true;
         }
         saveState();
+        checkAllCompletedAndCelebrate(wasAllDone);
       }
     }
 
@@ -1340,8 +1614,16 @@ END:VCALENDAR`;
     }
 
     // -------------------------------------------------------------
-    // ANALYSIS TAB (Date Ranges + Main Heatmaps + Habit Heatmaps)
+    // ANALYSIS TAB (Validated Date Ranges + Main & Habit Heatmaps)
     // -------------------------------------------------------------
+    function syncCustomDateLimits() {
+      const startEl = document.getElementById('custom-date-start');
+      const endEl = document.getElementById('custom-date-end');
+      if (!startEl || !endEl) return;
+      if (endEl.value) startEl.max = endEl.value;
+      if (startEl.value) endEl.min = startEl.value;
+    }
+
     function setAnalysisRange(range) {
       analysisRange = range;
       const customBox = document.getElementById('custom-range-box');
@@ -1350,6 +1632,7 @@ END:VCALENDAR`;
         if (!customStartDate) customStartDate = getDateStrDaysAgo(29);
         document.getElementById('custom-date-start').value = customStartDate;
         document.getElementById('custom-date-end').value = customEndDate;
+        syncCustomDateLimits();
         customBox.classList.remove('hidden');
       } else {
         customBox.classList.add('hidden');
@@ -1357,22 +1640,36 @@ END:VCALENDAR`;
       renderAnalysis();
     }
 
-    function onCustomDateChange() {
-      customStartDate = document.getElementById('custom-date-start').value;
-      customEndDate = document.getElementById('custom-date-end').value;
+    function onCustomDateChange(changedField) {
+      const startEl = document.getElementById('custom-date-start');
+      const endEl = document.getElementById('custom-date-end');
+      let s = startEl.value;
+      let e = endEl.value;
+
+      if (s && e && s > e) {
+        if (changedField === 'start') {
+          s = e;
+          startEl.value = s;
+        } else {
+          e = s;
+          endEl.value = e;
+        }
+        showToast('Başlangıç tarihi bitiş tarihinden ileri olamaz');
+      }
+
+      customStartDate = s;
+      customEndDate = e;
+      syncCustomDateLimits();
       renderAnalysis();
     }
 
     function getAnalysisDateList() {
       const dates = [];
       if (analysisRange === 'custom' && customStartDate && customEndDate) {
-        let start = new Date(customStartDate + 'T00:00:00');
-        let end = new Date(customEndDate + 'T00:00:00');
-        if (start > end) {
-          const tmp = start;
-          start = end;
-          end = tmp;
-        }
+        const start = new Date(customStartDate + 'T00:00:00');
+        const end = new Date(customEndDate + 'T00:00:00');
+        if (start > end) return [customEndDate];
+
         const cur = new Date(start);
         let guard = 0;
         while (cur <= end && guard < 730) {
@@ -1569,6 +1866,16 @@ END:VCALENDAR`;
         ? (evalData.note || 'Bu gün için özel not eklenmemiş.')
         : (habitsDone > 0 ? `Bu tarihte ${habitsDone} alışkanlık tamamlandı.` : 'Bu tarihe ait veri kaydı bulunmuyor.');
 
+      const photoWrap = document.getElementById('analysis-detail-photo-wrap');
+      const photoEl = document.getElementById('analysis-detail-photo');
+      if (evalData && evalData.photo) {
+        photoEl.src = evalData.photo;
+        photoWrap.classList.remove('hidden');
+      } else {
+        photoEl.src = '';
+        photoWrap.classList.add('hidden');
+      }
+
       renderAnalysis();
     }
 
@@ -1662,7 +1969,27 @@ END:VCALENDAR`;
     // MODALS & INPUT HANDLERS
     // -------------------------------------------------------------
     function openAddTaskModal() { document.getElementById('modal-task').classList.remove('hidden'); }
-    function openAddHabitModal() { document.getElementById('modal-habit').classList.remove('hidden'); }
+
+    function openAddHabitModal() {
+      editingHabitId = null;
+      document.getElementById('modal-habit-title').textContent = 'Yeni Alışkanlık Ekle';
+      document.getElementById('input-habit-title').value = '';
+      document.getElementById('input-habit-theme').value = 'navy';
+      document.getElementById('input-habit-time').value = '';
+      document.getElementById('modal-habit').classList.remove('hidden');
+    }
+
+    function openEditHabitModal(id) {
+      const h = appState.habits.find(item => item.id === id);
+      if (!h) return;
+      editingHabitId = id;
+      document.getElementById('modal-habit-title').textContent = 'Alışkanlığı Düzenle';
+      document.getElementById('input-habit-title').value = h.title || '';
+      document.getElementById('input-habit-theme').value = h.theme || 'navy';
+      document.getElementById('input-habit-time').value = h.time || '';
+      document.getElementById('modal-habit').classList.remove('hidden');
+    }
+
     function openAddGoalModal() { document.getElementById('modal-goal').classList.remove('hidden'); }
     function openSettingsModal() {
       updateNotificationUI();
@@ -1701,19 +2028,29 @@ END:VCALENDAR`;
 
       if (!title) return;
 
-      appState.habits.push({
-        id: 'h_' + Date.now(),
-        title,
-        theme,
-        time,
-        checkIns: {}
-      });
-
-      document.getElementById('input-habit-title').value = '';
-      document.getElementById('input-habit-time').value = '';
-      closeModal('modal-habit');
-      saveState();
-      showToast('Alışkanlık eklendi');
+      if (editingHabitId) {
+        const h = appState.habits.find(item => item.id === editingHabitId);
+        if (h) {
+          h.title = title;
+          h.theme = theme;
+          h.time = time;
+        }
+        editingHabitId = null;
+        closeModal('modal-habit');
+        saveState();
+        showToast('Alışkanlık güncellendi');
+      } else {
+        appState.habits.push({
+          id: 'h_' + Date.now(),
+          title,
+          theme,
+          time,
+          checkIns: {}
+        });
+        closeModal('modal-habit');
+        saveState();
+        showToast('Alışkanlık eklendi');
+      }
     }
 
     function saveGoal() {
@@ -1851,6 +2188,7 @@ END:VCALENDAR`;
     function performFactoryReset() {
       const keepDark = !!appState.settings?.darkMode;
       selectedAnalysisDate = null;
+      pendingDailyPhoto = '';
       appState = {
         initialized: true,
         user: { name: '', nameSet: false },
