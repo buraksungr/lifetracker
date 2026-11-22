@@ -90,23 +90,21 @@
 </head>
 <body class="h-full flex flex-col antialiased bg-[#F5F5F7] dark:bg-[#0B0D14] text-[#1D1D1F] dark:text-[#F3F4F6] font-normal transition-colors duration-200">
 
-  <!-- Main Scrollable App Container (extra top padding to stay clear of Dynamic Island) -->
+  <!-- Main Scrollable App Container -->
   <main id="app-container" class="flex-1 overflow-y-auto no-scrollbar w-full max-w-lg mx-auto px-4 pt-[calc(env(safe-area-inset-top)+28px)] pb-[calc(env(safe-area-inset-bottom)+110px)]">
 
     <!-- Header (Non-sticky, scrolls smoothly with entire page) -->
     <header class="flex items-center justify-between mb-5">
       <div>
-        <h1 id="header-greeting" class="text-2xl font-medium tracking-tight text-[#1D1D1F] dark:text-[#F3F4F6]">İyi akşamlar, Burak</h1>
+        <h1 id="header-greeting" class="text-2xl font-medium tracking-tight text-[#1D1D1F] dark:text-[#F3F4F6]">İyi akşamlar</h1>
         <p id="header-date" class="text-xs font-normal text-[#8E8E93] mt-0.5 tabular-nums">22 Kasım 2026 Pazar</p>
       </div>
       <div class="flex items-center gap-2">
         <!-- Dark Mode Toggle -->
         <button onclick="toggleDarkMode()" id="header-theme-btn" class="w-10 h-10 rounded-full bg-[#E5E5EA]/60 dark:bg-[#1C202E] active:bg-[#D1D1D6] dark:active:bg-[#2A3042] flex items-center justify-center transition-colors text-[#545456] dark:text-[#D1D5DB]" aria-label="Tema Değiştir">
-          <!-- Moon Icon (shown in light mode) -->
           <svg id="icon-moon" class="w-5 h-5 stroke-current fill-none stroke-[1.8]" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
           </svg>
-          <!-- Sun Icon (shown in dark mode) -->
           <svg id="icon-sun" class="w-5 h-5 stroke-current fill-none stroke-[1.8] hidden" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="5"/>
             <line x1="12" y1="1" x2="12" y2="3"/>
@@ -160,7 +158,7 @@
         </div>
       </div>
 
-      <!-- Birleşik Skor Card (Vibrant Orange #F25C19) -->
+      <!-- Birleşik Skor Card -->
       <div class="bg-[#F25C19] text-white rounded-2xl p-4 shadow-sm flex items-center justify-between">
         <div>
           <span class="text-xs font-normal text-white/80 block">Birleşik Günlük Skor</span>
@@ -278,9 +276,7 @@
         <!-- 1–10 Rating Scale -->
         <div>
           <label class="text-xs font-normal text-[#8E8E93] block mb-2">Gün Derecesi (1-10)</label>
-          <div class="grid grid-cols-10 gap-1" id="rating-selector">
-            <!-- 1-10 Buttons dynamically built -->
-          </div>
+          <div class="grid grid-cols-10 gap-1" id="rating-selector"></div>
         </div>
 
         <!-- Note Input -->
@@ -296,12 +292,12 @@
 
     </div>
 
-    <!-- TAB 2: ALIŞKANLIKLAR -->
+    <!-- TAB 2: ALIŞKANLIKLAR (Clean Add / Remove Management Only) -->
     <div id="tab-habits" class="tab-content hidden space-y-4">
       <div class="flex items-center justify-between mb-2">
         <div>
           <h2 class="text-lg font-medium text-[#1D1D1F] dark:text-[#F3F4F6]">Alışkanlıklar</h2>
-          <p class="text-xs font-normal text-[#8E8E93]">Düzenli aktiviteler ve mini ısı haritaları</p>
+          <p class="text-xs font-normal text-[#8E8E93]">Günlük rutinlerini ekle veya kaldır</p>
         </div>
         <button onclick="openAddHabitModal()" class="px-3 py-1.5 rounded-xl bg-[#141824] dark:bg-[#F25C19] active:bg-[#2C3246] text-white text-xs font-normal flex items-center gap-1.5 transition-colors shadow-sm">
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>
@@ -309,63 +305,12 @@
         </button>
       </div>
 
-      <!-- 2-Column Grid for Habits -->
-      <div id="habits-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div id="habits-grid" class="space-y-2.5">
         <!-- Rendered dynamically -->
       </div>
     </div>
 
-    <!-- TAB 3: ANALİZ -->
-    <div id="tab-analysis" class="tab-content hidden space-y-4">
-      <div>
-        <h2 class="text-lg font-medium text-[#1D1D1F] dark:text-[#F3F4F6]">Analiz</h2>
-        <p class="text-xs font-normal text-[#8E8E93]">Son 84 günlük detaylı performans takibi</p>
-      </div>
-
-      <!-- Selected Day Summary Card -->
-      <div id="analysis-detail-card" class="bg-white dark:bg-[#161923] rounded-2xl p-4 shadow-sm border border-black/[0.03] dark:border-white/[0.06] space-y-2">
-        <div class="flex items-center justify-between">
-          <span id="analysis-detail-date" class="text-xs font-medium text-[#1D1D1F] dark:text-[#F3F4F6]">Bir gün seçin</span>
-          <span id="analysis-detail-score" class="text-xs font-medium text-[#F25C19] tabular-nums">-</span>
-        </div>
-        <p id="analysis-detail-note" class="text-xs text-[#6E6E73] dark:text-[#9CA3AF] italic">Isı haritasındaki herhangi bir güne tıklayarak detayları görüntüleyebilirsiniz.</p>
-      </div>
-
-      <!-- 84-Day Task Score Heatmap (Orange) -->
-      <div class="bg-white dark:bg-[#161923] rounded-2xl p-4 shadow-sm border border-black/[0.03] dark:border-white/[0.06] space-y-3">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-normal text-[#1D1D1F] dark:text-[#F3F4F6]">Görev Puanı (84 Gün)</span>
-          <span class="text-[10px] text-[#8E8E93]">Turuncu Isı Haritası</span>
-        </div>
-        <div id="heatmap-task" class="grid grid-cols-12 gap-1.5">
-          <!-- 84 cells -->
-        </div>
-      </div>
-
-      <!-- 84-Day Mood Score Heatmap (Indigo) -->
-      <div class="bg-white dark:bg-[#161923] rounded-2xl p-4 shadow-sm border border-black/[0.03] dark:border-white/[0.06] space-y-3">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-normal text-[#1D1D1F] dark:text-[#F3F4F6]">Gün & Moral Puanı (84 Gün)</span>
-          <span class="text-[10px] text-[#8E8E93]">İndigo Isı Haritası</span>
-        </div>
-        <div id="heatmap-mood" class="grid grid-cols-12 gap-1.5">
-          <!-- 84 cells -->
-        </div>
-      </div>
-
-      <!-- 84-Day Combined Score Heatmap (Emerald) -->
-      <div class="bg-white dark:bg-[#161923] rounded-2xl p-4 shadow-sm border border-black/[0.03] dark:border-white/[0.06] space-y-3">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-normal text-[#1D1D1F] dark:text-[#F3F4F6]">Birleşik Skor (84 Gün)</span>
-          <span class="text-[10px] text-[#8E8E93]">Zümrüt Isı Haritası</span>
-        </div>
-        <div id="heatmap-combined" class="grid grid-cols-12 gap-1.5">
-          <!-- 84 cells -->
-        </div>
-      </div>
-    </div>
-
-    <!-- TAB 4: HEDEFLER -->
+    <!-- TAB 3: HEDEFLER -->
     <div id="tab-goals" class="tab-content hidden space-y-4">
       <div class="flex items-center justify-between mb-2">
         <div>
@@ -383,9 +328,86 @@
       </div>
     </div>
 
+    <!-- TAB 4: ANALİZ (Date Ranges + Main Heatmaps + Habit Heatmaps) -->
+    <div id="tab-analysis" class="tab-content hidden space-y-4">
+      <div>
+        <h2 class="text-lg font-medium text-[#1D1D1F] dark:text-[#F3F4F6]">Analiz</h2>
+        <p id="analysis-range-subtitle" class="text-xs font-normal text-[#8E8E93]">Son 3 aylık detaylı performans takibi</p>
+      </div>
+
+      <!-- Date Range Selector -->
+      <div class="space-y-2.5">
+        <div class="grid grid-cols-6 gap-1 bg-white dark:bg-[#161923] p-1 rounded-xl border border-black/[0.04] dark:border-white/[0.06] shadow-sm">
+          <button onclick="setAnalysisRange('1w')" data-range="1w" class="range-btn py-1.5 rounded-lg text-[11px] font-normal transition-all">1 Hf</button>
+          <button onclick="setAnalysisRange('1m')" data-range="1m" class="range-btn py-1.5 rounded-lg text-[11px] font-normal transition-all">1 Ay</button>
+          <button onclick="setAnalysisRange('3m')" data-range="3m" class="range-btn py-1.5 rounded-lg text-[11px] font-normal transition-all">3 Ay</button>
+          <button onclick="setAnalysisRange('6m')" data-range="6m" class="range-btn py-1.5 rounded-lg text-[11px] font-normal transition-all">6 Ay</button>
+          <button onclick="setAnalysisRange('1y')" data-range="1y" class="range-btn py-1.5 rounded-lg text-[11px] font-normal transition-all">1 Yıl</button>
+          <button onclick="setAnalysisRange('custom')" data-range="custom" class="range-btn py-1.5 rounded-lg text-[11px] font-normal transition-all">Özel</button>
+        </div>
+
+        <!-- Custom Date Range Inputs -->
+        <div id="custom-range-box" class="hidden bg-white dark:bg-[#161923] rounded-xl p-3 border border-black/[0.04] dark:border-white/[0.06] grid grid-cols-2 gap-2 text-xs">
+          <div>
+            <label class="block text-[10px] text-[#8E8E93] mb-1">Başlangıç</label>
+            <input id="custom-date-start" type="date" onchange="onCustomDateChange()" class="w-full p-2 rounded-lg bg-[#F5F5F7] dark:bg-[#1C202E] text-[#1D1D1F] dark:text-[#F3F4F6] border border-black/[0.04] dark:border-white/[0.08] text-[11px] tabular-nums">
+          </div>
+          <div>
+            <label class="block text-[10px] text-[#8E8E93] mb-1">Bitiş</label>
+            <input id="custom-date-end" type="date" onchange="onCustomDateChange()" class="w-full p-2 rounded-lg bg-[#F5F5F7] dark:bg-[#1C202E] text-[#1D1D1F] dark:text-[#F3F4F6] border border-black/[0.04] dark:border-white/[0.08] text-[11px] tabular-nums">
+          </div>
+        </div>
+      </div>
+
+      <!-- Selected Day Summary Card -->
+      <div id="analysis-detail-card" class="bg-white dark:bg-[#161923] rounded-2xl p-4 shadow-sm border border-black/[0.03] dark:border-white/[0.06] space-y-2">
+        <div class="flex items-center justify-between">
+          <span id="analysis-detail-date" class="text-xs font-medium text-[#1D1D1F] dark:text-[#F3F4F6] tabular-nums">Bir gün seçin</span>
+          <span id="analysis-detail-score" class="text-xs font-medium text-[#F25C19] tabular-nums">-</span>
+        </div>
+        <p id="analysis-detail-note" class="text-xs text-[#6E6E73] dark:text-[#9CA3AF] italic">Isı haritasındaki herhangi bir güne tıklayarak detayları görüntüleyebilirsiniz.</p>
+      </div>
+
+      <!-- Main Heatmaps -->
+      <div class="bg-white dark:bg-[#161923] rounded-2xl p-4 shadow-sm border border-black/[0.03] dark:border-white/[0.06] space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-normal text-[#1D1D1F] dark:text-[#F3F4F6]">Görev Puanı</span>
+          <span class="text-[10px] text-[#8E8E93] analysis-days-label">Turuncu Isı Haritası</span>
+        </div>
+        <div id="heatmap-task"></div>
+      </div>
+
+      <div class="bg-white dark:bg-[#161923] rounded-2xl p-4 shadow-sm border border-black/[0.03] dark:border-white/[0.06] space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-normal text-[#1D1D1F] dark:text-[#F3F4F6]">Gün & Moral Puanı</span>
+          <span class="text-[10px] text-[#8E8E93] analysis-days-label">İndigo Isı Haritası</span>
+        </div>
+        <div id="heatmap-mood"></div>
+      </div>
+
+      <div class="bg-white dark:bg-[#161923] rounded-2xl p-4 shadow-sm border border-black/[0.03] dark:border-white/[0.06] space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-normal text-[#1D1D1F] dark:text-[#F3F4F6]">Birleşik Skor</span>
+          <span class="text-[10px] text-[#8E8E93] analysis-days-label">Zümrüt Isı Haritası</span>
+        </div>
+        <div id="heatmap-combined"></div>
+      </div>
+
+      <!-- Habit Heatmaps Sub-section -->
+      <div class="pt-2 space-y-3">
+        <div class="flex items-center justify-between px-1">
+          <h3 class="text-sm font-medium text-[#1D1D1F] dark:text-[#F3F4F6]">Alışkanlık Isı Haritaları</h3>
+          <span id="analysis-habits-count" class="text-[11px] text-[#8E8E93] tabular-nums"></span>
+        </div>
+        <div id="analysis-habits-heatmaps" class="space-y-3">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+    </div>
+
   </main>
 
-  <!-- FULL-BOTTOM FLUSH & PROPORTIONED BOTTOM NAVIGATION BAR -->
+  <!-- BOTTOM NAVIGATION BAR (Order: Ana Sayfa - Alışkanlıklar - Hedefler - Analiz) -->
   <nav class="bottom-nav-fix fixed bottom-0 left-0 right-0 w-full z-40 bg-[#141824] text-white rounded-t-2xl shadow-2xl border-t border-white/10 pt-2.5 px-2">
     <div class="grid grid-cols-4 items-center max-w-md mx-auto">
       <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-tab-btn flex flex-col items-center justify-center gap-1 py-1.5 text-white transition-opacity">
@@ -404,6 +426,13 @@
         <span class="text-[11px] leading-none whitespace-nowrap tracking-tight">Alışkanlıklar</span>
       </button>
 
+      <button onclick="switchTab('goals')" id="nav-goals" class="nav-tab-btn flex flex-col items-center justify-center gap-1 py-1.5 text-white/50 hover:text-white transition-opacity">
+        <svg class="w-5 h-5 stroke-current fill-none stroke-[1.8]" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+        </svg>
+        <span class="text-[11px] leading-none whitespace-nowrap tracking-tight">Hedefler</span>
+      </button>
+
       <button onclick="switchTab('analysis')" id="nav-analysis" class="nav-tab-btn flex flex-col items-center justify-center gap-1 py-1.5 text-white/50 hover:text-white transition-opacity">
         <svg class="w-5 h-5 stroke-current fill-none stroke-[1.8]" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
           <line x1="18" y1="20" x2="18" y2="10"/>
@@ -412,15 +441,22 @@
         </svg>
         <span class="text-[11px] leading-none whitespace-nowrap tracking-tight">Analiz</span>
       </button>
-
-      <button onclick="switchTab('goals')" id="nav-goals" class="nav-tab-btn flex flex-col items-center justify-center gap-1 py-1.5 text-white/50 hover:text-white transition-opacity">
-        <svg class="w-5 h-5 stroke-current fill-none stroke-[1.8]" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-        </svg>
-        <span class="text-[11px] leading-none whitespace-nowrap tracking-tight">Hedefler</span>
-      </button>
     </div>
   </nav>
+
+  <!-- FIRST-LAUNCH NAME ONBOARDING MODAL -->
+  <div id="modal-onboarding" class="fixed inset-0 bg-[#F5F5F7]/95 dark:bg-[#0B0D14]/95 backdrop-blur-md z-50 flex items-center justify-center p-6 hidden">
+    <div class="bg-white dark:bg-[#161923] w-full max-w-sm rounded-3xl p-6 shadow-xl border border-black/[0.04] dark:border-white/[0.08] space-y-5 text-center">
+      <div class="flex flex-wrap items-baseline justify-center gap-2 text-lg font-medium text-[#1D1D1F] dark:text-[#F3F4F6] pt-2">
+        <span>tek isim sahibiyim</span>
+        <input id="input-onboarding-name" type="text" placeholder="..." autocomplete="given-name" onkeydown="if(event.key==='Enter') saveOnboardingName()" class="w-32 text-center bg-transparent border-b-2 border-[#141824] dark:border-[#F25C19] focus:outline-none text-lg font-medium text-[#F25C19] pb-0.5 placeholder-[#8E8E93]">
+      </div>
+      <p class="text-[11px] text-[#8E8E93]">Lütfen isminizi yazın</p>
+      <button onclick="saveOnboardingName()" class="w-full py-3 rounded-2xl bg-[#141824] dark:bg-[#F25C19] active:opacity-90 text-white text-xs font-medium transition-opacity shadow-sm">
+        Devam Et
+      </button>
+    </div>
+  </div>
 
   <!-- MODALS -->
 
@@ -458,7 +494,7 @@
     </div>
   </div>
 
-  <!-- Add Habit Modal -->
+  <!-- Add Habit Modal (Now with Optional Reminder Time) -->
   <div id="modal-habit" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
     <div class="bg-white dark:bg-[#161923] w-full max-w-md rounded-t-2xl sm:rounded-2xl p-5 space-y-4">
       <div class="flex items-center justify-between border-b border-black/[0.06] dark:border-white/[0.08] pb-3">
@@ -473,15 +509,21 @@
           <label class="block text-[#8E8E93] mb-1">Alışkanlık Başlığı</label>
           <input id="input-habit-title" type="text" placeholder="Örn: 2 Litre Su İç" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[#1D1D1F] dark:text-[#F3F4F6] border border-black/[0.04] dark:border-white/[0.08] focus:outline-none focus:ring-1 focus:ring-[#141824]">
         </div>
-        <div>
-          <label class="block text-[#8E8E93] mb-1">Kart Teması</label>
-          <select id="input-habit-theme" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[#1D1D1F] dark:text-[#F3F4F6] border border-black/[0.04] dark:border-white/[0.08] focus:outline-none focus:ring-1 focus:ring-[#141824]">
-            <option value="navy">Lacivert (Navy)</option>
-            <option value="emerald">Zümrüt (Emerald)</option>
-            <option value="amber">Kehribar (Amber)</option>
-            <option value="orange">Turuncu (Orange)</option>
-            <option value="pink">Pembe (Pink)</option>
-          </select>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-[#8E8E93] mb-1">Renk Teması</label>
+            <select id="input-habit-theme" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[#1D1D1F] dark:text-[#F3F4F6] border border-black/[0.04] dark:border-white/[0.08] focus:outline-none focus:ring-1 focus:ring-[#141824]">
+              <option value="navy">Lacivert (Navy)</option>
+              <option value="emerald">Zümrüt (Emerald)</option>
+              <option value="amber">Kehribar (Amber)</option>
+              <option value="orange">Turuncu (Orange)</option>
+              <option value="pink">Pembe (Pink)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[#8E8E93] mb-1">Hatırlatıcı Saati (Opsiyonel)</label>
+            <input id="input-habit-time" type="time" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[#1D1D1F] dark:text-[#F3F4F6] border border-black/[0.04] dark:border-white/[0.08] focus:outline-none focus:ring-1 focus:ring-[#141824] tabular-nums">
+          </div>
         </div>
       </div>
 
@@ -537,7 +579,6 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
       </div>
 
       <div class="space-y-3 text-xs">
-        <!-- Appearance Section -->
         <div class="p-3 bg-[#F5F5F7] dark:bg-[#1C202E] rounded-xl flex items-center justify-between">
           <span class="font-medium text-[#1D1D1F] dark:text-[#F3F4F6]">Koyu Mod</span>
           <button id="toggle-dark-btn" onclick="toggleDarkMode()" class="w-10 h-5 rounded-full bg-[#D1D1D6] relative transition-colors" aria-label="Koyu Mod">
@@ -545,7 +586,6 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
           </button>
         </div>
 
-        <!-- Notifications Section -->
         <div class="p-3 bg-[#F5F5F7] dark:bg-[#1C202E] rounded-xl space-y-2.5">
           <div class="flex items-center justify-between">
             <span class="font-medium text-[#1D1D1F] dark:text-[#F3F4F6]">Bildirimler & Hatırlatıcı</span>
@@ -580,7 +620,6 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
           </div>
         </div>
 
-        <!-- True Factory Reset Button -->
         <div class="p-3 bg-red-50 dark:bg-red-950/30 rounded-xl border border-red-100 dark:border-red-900/40 space-y-2">
           <span class="font-medium text-[#FF3B30] block">Tüm Verileri Sıfırla</span>
           <p class="text-[11px] text-[#8E8E93]">Tüm görev, alışkanlık, skor ve geçmiş kayıtlarınızı kalıcı olarak siler ve uygulamayı sıfırlar.</p>
@@ -594,7 +633,7 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
     </div>
   </div>
 
-  <!-- Notification Toast Container (Centered in middle of screen, clear of Dynamic Island) -->
+  <!-- Notification Toast Container (Centered) -->
   <div id="toast" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#141824] dark:bg-[#F3F4F6] text-white dark:text-[#141824] px-5 py-3 rounded-2xl text-xs font-medium shadow-2xl transition-all duration-200 opacity-0 pointer-events-none z-50 flex items-center gap-2 text-center max-w-[85vw]">
     <span id="toast-message">Bildirim</span>
   </div>
@@ -602,15 +641,15 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
 
   <!-- PWA & Application Logic -->
   <script>
-    // -------------------------------------------------------------
-    // LOCAL STORAGE STATE & IN-MEMORY MODEL
-    // -------------------------------------------------------------
     const STORAGE_KEY = 'gunluk_takip_pwa_v2';
     let selectedAnalysisDate = null;
+    let analysisRange = '3m'; // '1w' | '1m' | '3m' | '6m' | '1y' | 'custom'
+    let customStartDate = '';
+    let customEndDate = '';
 
     let appState = {
       initialized: false,
-      user: { name: 'Burak' },
+      user: { name: '', nameSet: false },
       settings: { soundEnabled: true, darkMode: false },
       tasks: [],
       habits: [],
@@ -620,7 +659,7 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
 
     const defaultData = {
       initialized: true,
-      user: { name: 'Burak' },
+      user: { name: '', nameSet: false },
       settings: { soundEnabled: true, darkMode: false },
       tasks: [
         { id: 't1', title: 'Sabah Yürüyüşü (30 dk)', points: 15, time: '08:00', completed: true },
@@ -628,10 +667,10 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
         { id: 't3', title: 'Günlük Rapor Hazırla', points: 25, time: '17:00', completed: false }
       ],
       habits: [
-        { id: 'h1', title: 'Su İçme (2.5L)', theme: 'navy', checkIns: {} },
-        { id: 'h2', title: 'Kitap Okuma', theme: 'emerald', checkIns: {} },
-        { id: 'h3', title: 'Egzersiz / Spor', theme: 'amber', checkIns: {} },
-        { id: 'h4', title: 'Yazılım Çalışma', theme: 'orange', checkIns: {} }
+        { id: 'h1', title: 'Su İçme (2.5L)', theme: 'navy', time: '10:00', checkIns: {} },
+        { id: 'h2', title: 'Kitap Okuma', theme: 'emerald', time: '21:30', checkIns: {} },
+        { id: 'h3', title: 'Egzersiz / Spor', theme: 'amber', time: '', checkIns: {} },
+        { id: 'h4', title: 'Yazılım Çalışma', theme: 'orange', time: '', checkIns: {} }
       ],
       goals: [
         {
@@ -648,19 +687,21 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
       evaluations: {}
     };
 
+    function formatLocalDate(d) {
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    }
+
     function getTodayStr() {
-      const d = new Date();
-      const offset = d.getTimezoneOffset();
-      const local = new Date(d.getTime() - offset * 60000);
-      return local.toISOString().split('T')[0];
+      return formatLocalDate(new Date());
     }
 
     function getDateStrDaysAgo(daysAgo) {
       const d = new Date();
       d.setDate(d.getDate() - daysAgo);
-      const offset = d.getTimezoneOffset();
-      const local = new Date(d.getTime() - offset * 60000);
-      return local.toISOString().split('T')[0];
+      return formatLocalDate(d);
     }
 
     function loadState() {
@@ -669,6 +710,7 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
         try {
           appState = JSON.parse(stored);
           if (!appState.settings) appState.settings = { soundEnabled: true, darkMode: false };
+          if (!appState.user) appState.user = { name: '', nameSet: false };
         } catch (e) {
           appState = defaultData;
         }
@@ -678,6 +720,31 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
       }
       applyTheme();
       renderApp();
+      checkOnboarding();
+    }
+
+    function checkOnboarding() {
+      if (!appState.user || !appState.user.nameSet) {
+        const modal = document.getElementById('modal-onboarding');
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+          const inp = document.getElementById('input-onboarding-name');
+          if (inp) inp.focus();
+        }, 100);
+      }
+    }
+
+    function saveOnboardingName() {
+      const inp = document.getElementById('input-onboarding-name');
+      const val = inp ? inp.value.trim() : '';
+      if (!val) {
+        showToast('Lütfen isminizi yazın');
+        if (inp) inp.focus();
+        return;
+      }
+      appState.user = { name: val, nameSet: true };
+      document.getElementById('modal-onboarding').classList.add('hidden');
+      saveState();
     }
 
     function saveState() {
@@ -728,7 +795,7 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
     }
 
     // -------------------------------------------------------------
-    // PWA DYNAMIC MANIFEST & DYNAMIC CANVAS ICON GENERATION
+    // PWA DYNAMIC MANIFEST & ICON GENERATION
     // -------------------------------------------------------------
     function setupPWAAssets() {
       const canvas = document.createElement('canvas');
@@ -790,7 +857,7 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
     function registerServiceWorker() {
       if ('serviceWorker' in navigator) {
         const swCode = `
-          const CACHE_NAME = 'gunluk-takip-v3';
+          const CACHE_NAME = 'gunluk-takip-v5';
           self.addEventListener('install', e => {
             e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(['./index.html'])));
             self.skipWaiting();
@@ -819,8 +886,8 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
       else if (hours >= 17 && hours < 22) greeting = 'İyi akşamlar';
       else greeting = 'İyi geceler';
 
-      const userName = appState.user?.name || 'Burak';
-      document.getElementById('header-greeting').textContent = `${greeting}, ${userName}`;
+      const userName = appState.user?.name?.trim();
+      document.getElementById('header-greeting').textContent = userName ? `${greeting}, ${userName}` : greeting;
 
       const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
       const dateStr = now.toLocaleDateString('tr-TR', options);
@@ -923,7 +990,6 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
       }
     }
 
-    // Real Weekly Bars Rendering (Last 7 Days - zero dummy data)
     function renderWeeklyBars() {
       const container = document.getElementById('weekly-bars-container');
       container.innerHTML = '';
@@ -933,7 +999,7 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
       for (let i = 6; i >= 0; i--) {
         const d = new Date();
         d.setDate(d.getDate() - i);
-        const dStr = getDateStrDaysAgo(i);
+        const dStr = formatLocalDate(d);
         const dayLabel = dayNames[d.getDay()];
 
         let heightPct = 0;
@@ -966,7 +1032,6 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
       }
     }
 
-    // Render Daily Tasks List (Habits + Manual Tasks)
     function renderTasksList() {
       const container = document.getElementById('tasks-list');
       container.innerHTML = '';
@@ -997,9 +1062,16 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
               </div>
               <div class="flex items-center gap-2 mt-0.5 text-[10px] text-[#8E8E93] tabular-nums">
                 <span>+10 Puan</span>
+                ${h.time ? `<span>• ${h.time}</span>` : ''}
               </div>
             </div>
           </div>
+          ${h.time ? `
+          <div class="flex items-center gap-1">
+            <button onclick="exportItemToICS('${escapeAttr(h.title)}', '${h.time}', 'Alışkanlık Hatırlatıcı')" class="p-1.5 text-[#8E8E93] hover:text-[#1D1D1F] dark:hover:text-white transition-colors" title="iCal Takvime Ekle">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            </button>
+          </div>` : ''}
         `;
         container.appendChild(item);
       });
@@ -1035,7 +1107,6 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
       });
     }
 
-    // Render Dashboard Goals Summary
     function renderDashboardGoals() {
       const section = document.getElementById('dash-goals-section');
       const container = document.getElementById('dash-goals-list');
@@ -1095,33 +1166,44 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
       showToast('Görev silindi');
     }
 
-    function exportTaskToICS(id) {
-      const task = appState.tasks.find(t => t.id === id);
-      if (!task) return;
-
+    function exportItemToICS(title, timeStr, desc) {
       const now = new Date();
-      const dateStr = now.toISOString().replace(/-|:|\.\d+/g, '').slice(0, 15) + 'Z';
-      
-      const icsData = 
+      let start = new Date(now);
+      if (timeStr && timeStr.includes(':')) {
+        const [hh, mm] = timeStr.split(':').map(Number);
+        start.setHours(hh, mm, 0, 0);
+      }
+      const end = new Date(start.getTime() + 30 * 60000);
+      const fmt = d => d.toISOString().replace(/-|:|\.\d+/g, '').slice(0, 15) + 'Z';
+
+      const icsData =
 `BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//Günlük Takip PWA//TR
 BEGIN:VEVENT
-UID:${id}@gunluktakip.app
-DTSTAMP:${dateStr}
-SUMMARY:${task.title}
-DESCRIPTION:Günlük Takip PWA Hatırlatıcı (+${task.points} Puan)
+UID:${Date.now()}@gunluktakip.app
+DTSTAMP:${fmt(now)}
+DTSTART:${fmt(start)}
+DTEND:${fmt(end)}
+SUMMARY:${title}
+DESCRIPTION:${desc}
 END:VEVENT
 END:VCALENDAR`;
 
       const blob = new Blob([icsData], { type: 'text/calendar;charset=utf-8' });
       const link = document.createElement('a');
       link.href = window.URL.createObjectURL(blob);
-      link.setAttribute('download', `${task.title}.ics`);
+      link.setAttribute('download', `${title}.ics`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      showToast('iCal takvim dosyası indirildi');
+      showToast('Takvim dosyası indirildi');
+    }
+
+    function exportTaskToICS(id) {
+      const task = appState.tasks.find(t => t.id === id);
+      if (!task) return;
+      exportItemToICS(task.title, task.time, `Günlük Takip PWA Hatırlatıcı (+${task.points} Puan)`);
     }
 
     // -------------------------------------------------------------
@@ -1184,14 +1266,22 @@ END:VCALENDAR`;
     }
 
     // -------------------------------------------------------------
-    // HABITS TAB
+    // HABITS TAB (Clean Add / Remove Only)
     // -------------------------------------------------------------
-    const THEME_CLASSES = {
-      navy: 'bg-[#141824] text-white',
-      emerald: 'bg-[#064E3B] text-white',
-      amber: 'bg-[#78350F] text-white',
-      orange: 'bg-[#9A3412] text-white',
-      pink: 'bg-[#831843] text-white'
+    const HABIT_DOT_COLORS = {
+      navy: 'bg-[#141824] dark:bg-[#60A5FA]',
+      emerald: 'bg-[#10B981]',
+      amber: 'bg-[#F59E0B]',
+      orange: 'bg-[#F25C19]',
+      pink: 'bg-[#EC4899]'
+    };
+
+    const HABIT_HEAT_COLORS = {
+      navy: 'bg-[#141824] dark:bg-[#60A5FA]',
+      emerald: 'bg-[#10B981]',
+      amber: 'bg-[#F59E0B]',
+      orange: 'bg-[#F25C19]',
+      pink: 'bg-[#EC4899]'
     };
 
     function renderHabits() {
@@ -1199,44 +1289,31 @@ END:VCALENDAR`;
       container.innerHTML = '';
 
       if (appState.habits.length === 0) {
-        container.innerHTML = '<p class="text-xs text-[#8E8E93] col-span-2 py-4 italic">Henüz alışkanlık eklenmedi.</p>';
+        container.innerHTML = '<p class="text-xs text-[#8E8E93] py-6 italic text-center">Henüz alışkanlık eklenmedi.</p>';
         return;
       }
 
       appState.habits.forEach(h => {
-        const themeStyle = THEME_CLASSES[h.theme] || THEME_CLASSES.navy;
-        const checkIns = h.checkIns || {};
-        const count = Object.keys(checkIns).length;
-        const todayStr = getTodayStr();
-        const isCheckedToday = !!checkIns[todayStr];
+        const dotColor = HABIT_DOT_COLORS[h.theme] || HABIT_DOT_COLORS.navy;
+        const count = Object.keys(h.checkIns || {}).length;
 
         const card = document.createElement('div');
-        card.className = `${themeStyle} rounded-2xl p-4 shadow-sm flex flex-col justify-between space-y-3 relative overflow-hidden`;
-
-        let heatmapHTML = '<div class="grid grid-cols-7 gap-1 mt-2">';
-        for (let i = 34; i >= 0; i--) {
-          const dStr = getDateStrDaysAgo(i);
-          const active = !!checkIns[dStr];
-          heatmapHTML += `<div class="aspect-square rounded-[3px] ${active ? 'bg-white/90' : 'bg-white/15'}" title="${dStr}"></div>`;
-        }
-        heatmapHTML += '</div>';
+        card.className = 'bg-white dark:bg-[#161923] rounded-2xl p-4 shadow-sm border border-black/[0.03] dark:border-white/[0.06] flex items-center justify-between';
 
         card.innerHTML = `
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-medium">${escapeHtml(h.title)}</span>
-            <button onclick="deleteHabit('${h.id}')" class="text-white/60 hover:text-white">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
-            </button>
+          <div class="flex items-center gap-3 min-w-0">
+            <span class="w-3 h-3 rounded-full shrink-0 ${dotColor}"></span>
+            <div class="min-w-0">
+              <p class="text-xs font-medium text-[#1D1D1F] dark:text-[#F3F4F6] truncate">${escapeHtml(h.title)}</p>
+              <div class="flex items-center gap-2 mt-0.5 text-[10px] text-[#8E8E93] tabular-nums">
+                <span>Toplam: ${count} gün</span>
+                ${h.time ? `<span>• Saat ${h.time}</span>` : ''}
+              </div>
+            </div>
           </div>
-
-          ${heatmapHTML}
-
-          <div class="flex items-center justify-between pt-1">
-            <span class="text-[10px] text-white/70 tabular-nums">Toplam: ${count} gün</span>
-            <button onclick="toggleHabitCheckIn('${h.id}')" class="px-3 py-1 rounded-xl bg-white/20 hover:bg-white/30 text-white text-xs font-normal transition-colors flex items-center gap-1 shadow-sm">
-              ${isCheckedToday ? '✓ Tamam' : '+ Check-In'}
-            </button>
-          </div>
+          <button onclick="deleteHabit('${h.id}')" class="p-2 text-[#8E8E93] hover:text-[#FF3B30] transition-colors shrink-0" title="Alışkanlığı Sil">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+          </button>
         `;
         container.appendChild(card);
       });
@@ -1263,36 +1340,144 @@ END:VCALENDAR`;
     }
 
     // -------------------------------------------------------------
-    // ANALYSIS TAB (3 x 84-Day Heatmaps with Selected Day Highlight)
+    // ANALYSIS TAB (Date Ranges + Main Heatmaps + Habit Heatmaps)
     // -------------------------------------------------------------
-    function renderAnalysis() {
-      renderSingleHeatmap('heatmap-task', 'orange');
-      renderSingleHeatmap('heatmap-mood', 'indigo');
-      renderSingleHeatmap('heatmap-combined', 'emerald');
+    function setAnalysisRange(range) {
+      analysisRange = range;
+      const customBox = document.getElementById('custom-range-box');
+      if (range === 'custom') {
+        if (!customEndDate) customEndDate = getTodayStr();
+        if (!customStartDate) customStartDate = getDateStrDaysAgo(29);
+        document.getElementById('custom-date-start').value = customStartDate;
+        document.getElementById('custom-date-end').value = customEndDate;
+        customBox.classList.remove('hidden');
+      } else {
+        customBox.classList.add('hidden');
+      }
+      renderAnalysis();
     }
 
-    function renderSingleHeatmap(containerId, colorType) {
+    function onCustomDateChange() {
+      customStartDate = document.getElementById('custom-date-start').value;
+      customEndDate = document.getElementById('custom-date-end').value;
+      renderAnalysis();
+    }
+
+    function getAnalysisDateList() {
+      const dates = [];
+      if (analysisRange === 'custom' && customStartDate && customEndDate) {
+        let start = new Date(customStartDate + 'T00:00:00');
+        let end = new Date(customEndDate + 'T00:00:00');
+        if (start > end) {
+          const tmp = start;
+          start = end;
+          end = tmp;
+        }
+        const cur = new Date(start);
+        let guard = 0;
+        while (cur <= end && guard < 730) {
+          dates.push(formatLocalDate(cur));
+          cur.setDate(cur.getDate() + 1);
+          guard++;
+        }
+        return dates;
+      }
+
+      const dayMap = { '1w': 7, '1m': 30, '3m': 90, '6m': 180, '1y': 365 };
+      const totalDays = dayMap[analysisRange] || 90;
+      for (let i = totalDays - 1; i >= 0; i--) {
+        dates.push(getDateStrDaysAgo(i));
+      }
+      return dates;
+    }
+
+    function getRangeLabelText(datesCount) {
+      const labels = {
+        '1w': 'Son 1 Hafta (7 Gün)',
+        '1m': 'Son 1 Ay (30 Gün)',
+        '3m': 'Son 3 Ay (90 Gün)',
+        '6m': 'Son 6 Ay (180 Gün)',
+        '1y': 'Son 1 Yıl (365 Gün)',
+        'custom': `Özel Aralık (${datesCount} Gün)`
+      };
+      return labels[analysisRange] || `${datesCount} Gün`;
+    }
+
+    function getHeatmapLayout(count) {
+      if (count <= 7) {
+        return { containerClass: 'grid grid-cols-7 gap-2', cellSizeClass: 'aspect-square rounded-lg' };
+      } else if (count <= 31) {
+        return { containerClass: 'grid grid-cols-7 gap-1.5', cellSizeClass: 'aspect-square rounded-[5px]' };
+      } else if (count <= 95) {
+        return { containerClass: 'grid grid-cols-12 gap-1.5', cellSizeClass: 'aspect-square rounded-[4px]' };
+      } else {
+        return { containerClass: 'grid grid-rows-7 grid-flow-col auto-cols-[13px] gap-1 overflow-x-auto pb-1 no-scrollbar', cellSizeClass: 'w-[13px] h-[13px] rounded-[3px]' };
+      }
+    }
+
+    function renderAnalysis() {
+      document.querySelectorAll('.range-btn').forEach(btn => {
+        const r = btn.getAttribute('data-range');
+        if (r === analysisRange) {
+          btn.className = 'range-btn py-1.5 rounded-lg text-[11px] font-medium bg-[#141824] dark:bg-[#F25C19] text-white transition-all shadow-sm';
+        } else {
+          btn.className = 'range-btn py-1.5 rounded-lg text-[11px] font-normal text-[#6E6E73] dark:text-[#9CA3AF] hover:text-[#1D1D1F] dark:hover:text-white transition-all';
+        }
+      });
+
+      const dates = getAnalysisDateList();
+      const rangeText = getRangeLabelText(dates.length);
+      document.getElementById('analysis-range-subtitle').textContent = `${rangeText} performans takibi`;
+
+      renderSingleHeatmap('heatmap-task', 'orange', dates);
+      renderSingleHeatmap('heatmap-mood', 'indigo', dates);
+      renderSingleHeatmap('heatmap-combined', 'emerald', dates);
+      renderAnalysisHabitHeatmaps(dates);
+    }
+
+    function renderSingleHeatmap(containerId, colorType, dates) {
       const container = document.getElementById(containerId);
+      const { containerClass, cellSizeClass } = getHeatmapLayout(dates.length);
+      container.className = containerClass;
       container.innerHTML = '';
 
-      for (let i = 83; i >= 0; i--) {
-        const dStr = getDateStrDaysAgo(i);
+      const todayStr = getTodayStr();
+
+      dates.forEach(dStr => {
         const evalData = appState.evaluations[dStr];
+        let val = null;
+
+        if (colorType === 'orange') {
+          if (dStr === todayStr) {
+            const liveTask = getTodayTaskStats().score;
+            val = liveTask > 0 ? liveTask : (evalData?.taskScore ?? (evalData?.rating ? evalData.rating * 10 : null));
+          } else if (evalData) {
+            val = evalData.taskScore != null ? evalData.taskScore : (evalData.rating ? evalData.rating * 10 : null);
+          }
+        } else if (colorType === 'indigo') {
+          if (evalData && evalData.rating) val = evalData.rating * 10;
+        } else {
+          if (dStr === todayStr) {
+            const liveComb = getTodayCombinedScore();
+            val = liveComb > 0 ? liveComb : (evalData?.combinedScore ?? (evalData?.rating ? evalData.rating * 10 : null));
+          } else if (evalData) {
+            val = evalData.combinedScore != null ? evalData.combinedScore : (evalData.rating ? evalData.rating * 10 : null);
+          }
+        }
 
         let intensityClass = 'bg-[#E5E5EA]/50 dark:bg-[#232838]';
-        if (evalData) {
-          const score = evalData.rating || 5;
+        if (val !== null && val > 0) {
           if (colorType === 'orange') {
-            if (score >= 8) intensityClass = 'bg-[#F25C19]';
-            else if (score >= 5) intensityClass = 'bg-[#FF9500]';
+            if (val >= 75) intensityClass = 'bg-[#F25C19]';
+            else if (val >= 45) intensityClass = 'bg-[#FF9500]';
             else intensityClass = 'bg-[#FFCC00]';
           } else if (colorType === 'indigo') {
-            if (score >= 8) intensityClass = 'bg-[#5E5CE6]';
-            else if (score >= 5) intensityClass = 'bg-[#7D7AFF]';
+            if (val >= 80) intensityClass = 'bg-[#5E5CE6]';
+            else if (val >= 50) intensityClass = 'bg-[#7D7AFF]';
             else intensityClass = 'bg-[#B0B0FF]';
           } else {
-            if (score >= 8) intensityClass = 'bg-[#34C759]';
-            else if (score >= 5) intensityClass = 'bg-[#30B0C7]';
+            if (val >= 75) intensityClass = 'bg-[#34C759]';
+            else if (val >= 45) intensityClass = 'bg-[#30B0C7]';
             else intensityClass = 'bg-[#A3D5FF]';
           }
         }
@@ -1303,22 +1488,87 @@ END:VCALENDAR`;
           : '';
 
         const cell = document.createElement('button');
-        cell.className = `aspect-square rounded-[4px] ${intensityClass} ${selectedClass} transition-transform active:scale-95`;
-        cell.onclick = () => selectAnalysisDay(dStr, evalData);
+        cell.title = dStr;
+        cell.className = `${cellSizeClass} ${intensityClass} ${selectedClass} transition-transform active:scale-95`;
+        cell.onclick = () => selectAnalysisDay(dStr);
         container.appendChild(cell);
-      }
+      });
     }
 
-    function selectAnalysisDay(dateStr, evalData) {
-      selectedAnalysisDate = dateStr;
-      document.getElementById('analysis-detail-date').textContent = dateStr;
-      if (evalData) {
-        document.getElementById('analysis-detail-score').textContent = `Moral: ${evalData.rating}/10`;
-        document.getElementById('analysis-detail-note').textContent = evalData.note || 'Bu gün için özel not eklenmemiş.';
-      } else {
-        document.getElementById('analysis-detail-score').textContent = 'Kayıt Yok';
-        document.getElementById('analysis-detail-note').textContent = 'Bu tarihe ait veri kaydı bulunmuyor.';
+    function renderAnalysisHabitHeatmaps(dates) {
+      const container = document.getElementById('analysis-habits-heatmaps');
+      const countEl = document.getElementById('analysis-habits-count');
+      const habits = appState.habits || [];
+
+      countEl.textContent = `${habits.length} alışkanlık`;
+      container.innerHTML = '';
+
+      if (habits.length === 0) {
+        container.innerHTML = '<div class="bg-white dark:bg-[#161923] rounded-2xl p-4 text-xs text-[#8E8E93] italic text-center border border-black/[0.03] dark:border-white/[0.06]">Henüz alışkanlık eklenmedi.</div>';
+        return;
       }
+
+      const { containerClass, cellSizeClass } = getHeatmapLayout(dates.length);
+
+      habits.forEach(h => {
+        const checkIns = h.checkIns || {};
+        const doneInRange = dates.filter(d => !!checkIns[d]).length;
+        const fillColor = HABIT_HEAT_COLORS[h.theme] || HABIT_HEAT_COLORS.navy;
+        const dotColor = HABIT_DOT_COLORS[h.theme] || HABIT_DOT_COLORS.navy;
+
+        const card = document.createElement('div');
+        card.className = 'bg-white dark:bg-[#161923] rounded-2xl p-4 shadow-sm border border-black/[0.03] dark:border-white/[0.06] space-y-3';
+
+        const header = document.createElement('div');
+        header.className = 'flex items-center justify-between';
+        header.innerHTML = `
+          <div class="flex items-center gap-2 min-w-0">
+            <span class="w-2.5 h-2.5 rounded-full shrink-0 ${dotColor}"></span>
+            <span class="text-xs font-normal text-[#1D1D1F] dark:text-[#F3F4F6] truncate">${escapeHtml(h.title)}</span>
+          </div>
+          <span class="text-[10px] text-[#8E8E93] tabular-nums shrink-0">${doneInRange}/${dates.length} gün</span>
+        `;
+
+        const grid = document.createElement('div');
+        grid.className = containerClass;
+
+        dates.forEach(dStr => {
+          const active = !!checkIns[dStr];
+          const isSelected = selectedAnalysisDate === dStr;
+          const selectedClass = isSelected
+            ? 'ring-2 ring-[#141824] dark:ring-white ring-offset-1 ring-offset-white dark:ring-offset-[#161923] z-10'
+            : '';
+
+          const cell = document.createElement('button');
+          cell.title = dStr;
+          cell.className = `${cellSizeClass} ${active ? fillColor : 'bg-[#E5E5EA]/50 dark:bg-[#232838]'} ${selectedClass} transition-transform active:scale-95`;
+          cell.onclick = () => selectAnalysisDay(dStr);
+          grid.appendChild(cell);
+        });
+
+        card.appendChild(header);
+        card.appendChild(grid);
+        container.appendChild(card);
+      });
+    }
+
+    function selectAnalysisDay(dateStr) {
+      selectedAnalysisDate = dateStr;
+      const evalData = appState.evaluations[dateStr];
+      const habits = appState.habits || [];
+      const habitsDone = habits.filter(h => h.checkIns && h.checkIns[dateStr]).length;
+
+      document.getElementById('analysis-detail-date').textContent = dateStr;
+
+      const scoreParts = [];
+      if (evalData && evalData.rating) scoreParts.push(`Moral: ${evalData.rating}/10`);
+      if (habits.length > 0) scoreParts.push(`Alışkanlık: ${habitsDone}/${habits.length}`);
+
+      document.getElementById('analysis-detail-score').textContent = scoreParts.length > 0 ? scoreParts.join(' • ') : 'Kayıt Yok';
+      document.getElementById('analysis-detail-note').textContent = evalData
+        ? (evalData.note || 'Bu gün için özel not eklenmemiş.')
+        : (habitsDone > 0 ? `Bu tarihte ${habitsDone} alışkanlık tamamlandı.` : 'Bu tarihe ait veri kaydı bulunmuyor.');
+
       renderAnalysis();
     }
 
@@ -1438,6 +1688,7 @@ END:VCALENDAR`;
       });
 
       document.getElementById('input-task-title').value = '';
+      document.getElementById('input-task-time').value = '';
       closeModal('modal-task');
       saveState();
       showToast('Görev eklendi');
@@ -1446,6 +1697,7 @@ END:VCALENDAR`;
     function saveHabit() {
       const title = document.getElementById('input-habit-title').value.trim();
       const theme = document.getElementById('input-habit-theme').value;
+      const time = document.getElementById('input-habit-time').value;
 
       if (!title) return;
 
@@ -1453,10 +1705,12 @@ END:VCALENDAR`;
         id: 'h_' + Date.now(),
         title,
         theme,
+        time,
         checkIns: {}
       });
 
       document.getElementById('input-habit-title').value = '';
+      document.getElementById('input-habit-time').value = '';
       closeModal('modal-habit');
       saveState();
       showToast('Alışkanlık eklendi');
@@ -1599,7 +1853,7 @@ END:VCALENDAR`;
       selectedAnalysisDate = null;
       appState = {
         initialized: true,
-        user: { name: 'Burak' },
+        user: { name: '', nameSet: false },
         settings: { soundEnabled: true, darkMode: keepDark },
         tasks: [],
         habits: [],
@@ -1608,11 +1862,13 @@ END:VCALENDAR`;
       };
       saveState();
       closeModal('modal-settings');
+      document.getElementById('input-onboarding-name').value = '';
+      checkOnboarding();
       showToast('Tüm veriler sıfırlandı');
     }
 
     // -------------------------------------------------------------
-    // AUDIO CHIME & TIME SCHEDULER (Includes Daily 23:30 Reminder)
+    // AUDIO CHIME & TIME SCHEDULER (Tasks, Habits & Daily 23:30)
     // -------------------------------------------------------------
     function playSoftChime() {
       try {
@@ -1642,7 +1898,6 @@ END:VCALENDAR`;
       const currentHHMM = now.toTimeString().slice(0, 5);
       const todayStr = getTodayStr();
 
-      // Scheduled manual tasks
       appState.tasks.forEach(t => {
         if (t.time === currentHHMM && t.lastNotifiedDate !== todayStr) {
           if (appState.settings?.soundEnabled !== false) playSoftChime();
@@ -1655,7 +1910,18 @@ END:VCALENDAR`;
         }
       });
 
-      // Daily 23:30 End-of-Day Evaluation Reminder
+      appState.habits.forEach(h => {
+        if (h.time === currentHHMM && h.lastNotifiedDate !== todayStr) {
+          if (appState.settings?.soundEnabled !== false) playSoftChime();
+          showToast(`Alışkanlık: ${h.title}`);
+          h.lastNotifiedDate = todayStr;
+
+          if ("Notification" in window && Notification.permission === "granted") {
+            new Notification("Alışkanlık Hatırlatıcı", { body: h.title });
+          }
+        }
+      });
+
       if (currentHHMM === '23:30') {
         const lastEvalNotif = localStorage.getItem('last_eval_notif_date');
         if (lastEvalNotif !== todayStr) {
@@ -1685,12 +1951,16 @@ END:VCALENDAR`;
       return String(str).replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>').replace(/"/g, '"');
     }
 
+    function escapeAttr(str) {
+      return String(str).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '"');
+    }
+
     function renderApp() {
       updateHeader();
       renderDashboard();
       renderHabits();
-      renderAnalysis();
       renderGoals();
+      renderAnalysis();
     }
 
     window.onload = function() {
