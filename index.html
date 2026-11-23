@@ -240,17 +240,14 @@
         <div id="dash-goals-list" class="space-y-2"></div>
       </div>
 
-      <!-- Gün Sonu Değerlendirme (With Photo Support + 23:30 Calendar Export) -->
+      <!-- Gün Sonu Değerlendirme (With Photo Support) -->
       <div class="bg-white dark:bg-[#161923] rounded-2xl p-4 shadow-sm border border-black/[0.03] dark:border-white/[0.06] space-y-4">
         <div class="flex items-center justify-between">
           <div>
             <h2 class="text-sm font-medium text-[#1D1D1F] dark:text-[#F3F4F6]">Gün Sonu Değerlendirme</h2>
             <p class="text-[11px] font-normal text-[#8E8E93]">Bugünkü modunu, notunu ve fotoğrafını kaydet</p>
           </div>
-          <button onclick="exportItemToICS('Gün Sonu Değerlendirme', '23:30', 'Bugünü puanlamayı ve kısa bir not bırakmayı unutma.', true)" class="flex items-center gap-1 text-[10px] text-[#8E8E93] hover:text-[#F25C19] transition-colors tabular-nums" title="Her gün 23:30 için iPhone Takvime ekle">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-            <span>23:30</span>
-          </button>
+          <span class="text-[10px] text-[#8E8E93] tabular-nums">Her gün 23:30</span>
         </div>
 
         <!-- 5 Vector SVG Mood Faces -->
@@ -401,7 +398,7 @@
         </div>
       </div>
 
-      <!-- Selected Day Summary Card -->
+      <!-- Selected Day Summary Card (Now displays saved photo too) -->
       <div id="analysis-detail-card" class="bg-white dark:bg-[#161923] rounded-2xl p-4 shadow-sm border border-black/[0.03] dark:border-white/[0.06] space-y-2.5">
         <div class="flex items-center justify-between">
           <span id="analysis-detail-date" class="text-xs font-medium text-[#1D1D1F] dark:text-[#F3F4F6] tabular-nums">Bir gün seçin</span>
@@ -638,9 +635,6 @@
               <span id="toggle-sound-dot" class="w-4 h-4 rounded-full bg-white absolute top-0.5 right-0.5 transition-all"></span>
             </button>
           </div>
-          <p class="text-[10px] text-[#8E8E93] leading-relaxed">
-            iPhone kapalıyken de her gün tam saatinde bildirim almak için saatli alışkanlıkların yanındaki takvim ikonuna bir kez dokunup Takvime ekleyin.
-          </p>
           <div class="flex gap-2 pt-1">
             <button onclick="requestNotificationPermission()" class="flex-1 py-2 rounded-lg bg-white dark:bg-[#161923] border border-black/[0.06] dark:border-white/[0.08] text-[#1D1D1F] dark:text-[#F3F4F6] flex items-center justify-center gap-1.5 shadow-sm">
               <span>Bildirim İzni Ver</span>
@@ -767,7 +761,6 @@
       applyTheme();
       renderApp();
       checkOnboarding();
-      checkScheduledTasks();
     }
 
     function checkOnboarding() {
@@ -979,7 +972,7 @@
     function registerServiceWorker() {
       if ('serviceWorker' in navigator) {
         const swCode = `
-          const CACHE_NAME = 'gunluk-takip-v7';
+          const CACHE_NAME = 'gunluk-takip-v6';
           self.addEventListener('install', e => {
             e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(['./index.html'])));
             self.skipWaiting();
@@ -1194,7 +1187,7 @@
           </div>
           ${h.time ? `
           <div class="flex items-center gap-1">
-            <button onclick="exportItemToICS('${escapeAttr(h.title)}', '${h.time}', 'Günlük Alışkanlık Hatırlatıcı', true)" class="p-1.5 text-[#8E8E93] hover:text-[#F25C19] transition-colors" title="Her gün bildirim için iPhone Takvime ekle">
+            <button onclick="exportItemToICS('${escapeAttr(h.title)}', '${h.time}', 'Alışkanlık Hatırlatıcı')" class="p-1.5 text-[#8E8E93] hover:text-[#1D1D1F] dark:hover:text-white transition-colors" title="iCal Takvime Ekle">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
             </button>
           </div>` : ''}
@@ -1221,7 +1214,7 @@
             </div>
           </div>
           <div class="flex items-center gap-1">
-            <button onclick="exportTaskToICS('${t.id}')" class="p-1.5 text-[#8E8E93] hover:text-[#F25C19] transition-colors" title="iPhone Takvime Ekle">
+            <button onclick="exportTaskToICS('${t.id}')" class="p-1.5 text-[#8E8E93] hover:text-[#1D1D1F] dark:hover:text-white transition-colors" title="iCal Takvime Ekle">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
             </button>
             <button onclick="deleteTask('${t.id}')" class="p-1.5 text-[#8E8E93] hover:text-[#FF3B30] transition-colors" title="Sil">
@@ -1303,48 +1296,30 @@
       showToast('Görev silindi');
     }
 
-    // Enhanced .ics Export with RRULE:FREQ=DAILY (for habits) & VALARM (for lock-screen alerts)
-    function exportItemToICS(title, timeStr, desc, isDaily = false) {
+    function exportItemToICS(title, timeStr, desc) {
       const now = new Date();
-      const start = new Date(now);
+      let start = new Date(now);
       if (timeStr && timeStr.includes(':')) {
         const [hh, mm] = timeStr.split(':').map(Number);
         start.setHours(hh, mm, 0, 0);
       }
-      const end = new Date(start.getTime() + 15 * 60000);
+      const end = new Date(start.getTime() + 30 * 60000);
+      const fmt = d => d.toISOString().replace(/-|:|\.\d+/g, '').slice(0, 15) + 'Z';
 
-      const pad = n => String(n).padStart(2, '0');
-      const fmtLocal = d => `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}00`;
-      const fmtUTC = d => d.toISOString().replace(/-|:|\.\d+/g, '').slice(0, 15) + 'Z';
+      const icsData =
+`BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Günlük Takip PWA//TR
+BEGIN:VEVENT
+UID:${Date.now()}@gunluktakip.app
+DTSTAMP:${fmt(now)}
+DTSTART:${fmt(start)}
+DTEND:${fmt(end)}
+SUMMARY:${title}
+DESCRIPTION:${desc}
+END:VEVENT
+END:VCALENDAR`;
 
-      const lines = [
-        'BEGIN:VCALENDAR',
-        'VERSION:2.0',
-        'PRODID:-//Gunluk Takip PWA//TR',
-        'BEGIN:VEVENT',
-        `UID:${Date.now()}-${Math.random().toString(36).slice(2, 7)}@gunluktakip.app`,
-        `DTSTAMP:${fmtUTC(now)}`,
-        `DTSTART:${fmtLocal(start)}`,
-        `DTEND:${fmtLocal(end)}`,
-        `SUMMARY:${title}`,
-        `DESCRIPTION:${desc}`
-      ];
-
-      if (isDaily) {
-        lines.push('RRULE:FREQ=DAILY');
-      }
-
-      lines.push(
-        'BEGIN:VALARM',
-        'TRIGGER:PT0M',
-        'ACTION:DISPLAY',
-        `DESCRIPTION:${title}`,
-        'END:VALARM',
-        'END:VEVENT',
-        'END:VCALENDAR'
-      );
-
-      const icsData = lines.join('\r\n');
       const blob = new Blob([icsData], { type: 'text/calendar;charset=utf-8' });
       const link = document.createElement('a');
       link.href = window.URL.createObjectURL(blob);
@@ -1352,13 +1327,13 @@
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      showToast(isDaily ? 'Günlük tekrarlı takvim bildirimi indirildi' : 'Takvim bildirimi indirildi');
+      showToast('Takvim dosyası indirildi');
     }
 
     function exportTaskToICS(id) {
       const task = appState.tasks.find(t => t.id === id);
       if (!task) return;
-      exportItemToICS(task.title, task.time, `Günlük Takip Hatırlatıcı (+${task.points} Puan)`, false);
+      exportItemToICS(task.title, task.time, `Günlük Takip PWA Hatırlatıcı (+${task.points} Puan)`);
     }
 
     // -------------------------------------------------------------
@@ -1473,7 +1448,7 @@
     }
 
     // -------------------------------------------------------------
-    // HABITS TAB (Edit + Drag-and-Drop Reorder + Calendar + Delete)
+    // HABITS TAB (Edit + Drag-and-Drop Reorder + Delete)
     // -------------------------------------------------------------
     const HABIT_DOT_COLORS = {
       navy: 'bg-[#141824] dark:bg-[#60A5FA]',
@@ -1528,10 +1503,6 @@
             </div>
           </div>
           <div class="flex items-center gap-0.5 shrink-0">
-            ${h.time ? `
-            <button onclick="exportItemToICS('${escapeAttr(h.title)}', '${h.time}', 'Günlük Alışkanlık Hatırlatıcı', true)" class="p-2 text-[#8E8E93] hover:text-[#F25C19] transition-colors" title="Her gün bildirim için iPhone Takvime ekle">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-            </button>` : ''}
             <button onclick="openEditHabitModal('${h.id}')" class="p-2 text-[#8E8E93] hover:text-[#1D1D1F] dark:hover:text-white transition-colors" title="Düzenle">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path stroke-linecap="round" stroke-linejoin="round" d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
             </button>
@@ -1548,6 +1519,7 @@
       });
     }
 
+    // Pointer-based Drag & Drop (Works on iOS Touch + Desktop Mouse)
     let dragState = null;
 
     function startHabitDrag(e, card) {
@@ -1640,7 +1612,7 @@
     }
 
     // -------------------------------------------------------------
-    // ANALYSIS TAB
+    // ANALYSIS TAB (Validated Date Ranges + Main & Habit Heatmaps)
     // -------------------------------------------------------------
     function syncCustomDateLimits() {
       const startEl = document.getElementById('custom-date-start');
@@ -2105,25 +2077,8 @@
     }
 
     // -------------------------------------------------------------
-    // NOTIFICATIONS SETTINGS & iOS-SAFE DELIVERY
+    // NOTIFICATIONS SETTINGS & HANDLERS
     // -------------------------------------------------------------
-    function sendSystemNotification(title, body) {
-      if (!('Notification' in window) || Notification.permission !== 'granted') return;
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.ready.then(reg => {
-          if (reg && reg.showNotification) {
-            reg.showNotification(title, { body });
-          } else {
-            new Notification(title, { body });
-          }
-        }).catch(() => {
-          try { new Notification(title, { body }); } catch (e) {}
-        });
-      } else {
-        try { new Notification(title, { body }); } catch (e) {}
-      }
-    }
-
     function updateNotificationUI() {
       const badge = document.getElementById('notif-status-badge');
       if (badge) {
@@ -2186,7 +2141,9 @@
         playSoftChime();
       }
       showToast('Test bildirimi gönderildi');
-      sendSystemNotification('Günlük Takip', 'Bildirimler sorunsuz çalışıyor!');
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification('Günlük Takip', { body: 'Bildirimler sorunsuz çalışıyor!' });
+      }
     }
 
     // -------------------------------------------------------------
@@ -2247,7 +2204,7 @@
     }
 
     // -------------------------------------------------------------
-    // AUDIO CHIME & IMPROVED TIME SCHEDULER
+    // AUDIO CHIME & TIME SCHEDULER (Tasks, Habits & Daily 23:30)
     // -------------------------------------------------------------
     function playSoftChime() {
       try {
@@ -2272,76 +2229,48 @@
       } catch (e) {}
     }
 
-    function timeToMinutes(hhmm) {
-      if (!hhmm || !hhmm.includes(':')) return null;
-      const [h, m] = hhmm.split(':').map(Number);
-      if (isNaN(h) || isNaN(m)) return null;
-      return h * 60 + m;
-    }
-
-    function getNotifiedSet(todayStr) {
-      try {
-        return JSON.parse(localStorage.getItem('notified_' + todayStr) || '{}');
-      } catch (e) {
-        return {};
-      }
-    }
-
-    function markNotified(todayStr, key) {
-      const set = getNotifiedSet(todayStr);
-      set[key] = true;
-      localStorage.setItem('notified_' + todayStr, JSON.stringify(set));
-    }
-
     function checkScheduledTasks() {
       const now = new Date();
-      const nowMins = now.getHours() * 60 + now.getMinutes();
+      const currentHHMM = now.toTimeString().slice(0, 5);
       const todayStr = getTodayStr();
-      const notified = getNotifiedSet(todayStr);
 
-      // Scheduled manual tasks (exact minute or up to 30 mins late if uncompleted)
-      (appState.tasks || []).forEach(t => {
-        if (!t.time || t.completed) return;
-        const targetMins = timeToMinutes(t.time);
-        const key = 'task_' + t.id + '_' + t.time;
-        if (targetMins !== null && nowMins >= targetMins && nowMins <= targetMins + 30 && !notified[key]) {
-          markNotified(todayStr, key);
+      appState.tasks.forEach(t => {
+        if (t.time === currentHHMM && t.lastNotifiedDate !== todayStr) {
           if (appState.settings?.soundEnabled !== false) playSoftChime();
           showToast(`Hatırlatıcı: ${t.title}`);
-          sendSystemNotification('Günlük Takip', t.title);
+          t.lastNotifiedDate = todayStr;
+
+          if ("Notification" in window && Notification.permission === "granted") {
+            new Notification("Günlük Takip", { body: t.title });
+          }
         }
       });
 
-      // Scheduled habits (exact minute or up to 30 mins late if not checked in today)
-      (appState.habits || []).forEach(h => {
-        if (!h.time) return;
-        if (h.checkIns && h.checkIns[todayStr]) return;
-        const targetMins = timeToMinutes(h.time);
-        const key = 'habit_' + h.id + '_' + h.time;
-        if (targetMins !== null && nowMins >= targetMins && nowMins <= targetMins + 30 && !notified[key]) {
-          markNotified(todayStr, key);
+      appState.habits.forEach(h => {
+        if (h.time === currentHHMM && h.lastNotifiedDate !== todayStr) {
           if (appState.settings?.soundEnabled !== false) playSoftChime();
           showToast(`Alışkanlık: ${h.title}`);
-          sendSystemNotification('Alışkanlık Hatırlatıcı', h.title);
+          h.lastNotifiedDate = todayStr;
+
+          if ("Notification" in window && Notification.permission === "granted") {
+            new Notification("Alışkanlık Hatırlatıcı", { body: h.title });
+          }
         }
       });
 
-      // Daily 23:30 End-of-Day Evaluation Reminder
-      const evalTarget = 23 * 60 + 30;
-      const evalKey = 'eval_2330';
-      if (nowMins >= evalTarget && nowMins <= evalTarget + 29 && !notified[evalKey] && !appState.evaluations[todayStr]) {
-        markNotified(todayStr, evalKey);
-        if (appState.settings?.soundEnabled !== false) playSoftChime();
-        showToast('Gün sonu değerlendirmeni yapmayı unutma!');
-        sendSystemNotification('Gün Sonu Değerlendirme', 'Bugünü puanlamayı ve kısa bir not bırakmayı unutma.');
+      if (currentHHMM === '23:30') {
+        const lastEvalNotif = localStorage.getItem('last_eval_notif_date');
+        if (lastEvalNotif !== todayStr) {
+          localStorage.setItem('last_eval_notif_date', todayStr);
+          if (appState.settings?.soundEnabled !== false) playSoftChime();
+          showToast('Gün sonu değerlendirmeni yapmayı unutma!');
+          if ("Notification" in window && Notification.permission === "granted") {
+            new Notification("Gün Sonu Değerlendirme", { body: "Bugünü puanlamayı ve kısa bir not bırakmayı unutma." });
+          }
+        }
       }
     }
-
-    setInterval(checkScheduledTasks, 15000);
-    document.addEventListener('visibilitychange', () => {
-      if (!document.hidden) checkScheduledTasks();
-    });
-    window.addEventListener('focus', checkScheduledTasks);
+    setInterval(checkScheduledTasks, 30000);
 
     let toastTimer = null;
     function showToast(msg) {
