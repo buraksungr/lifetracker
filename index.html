@@ -128,7 +128,7 @@
     <header class="flex items-center justify-between mb-5">
       <div>
         <h1 id="header-greeting" class="text-2xl font-medium tracking-tight text-[#1D1D1F] dark:text-[#F3F4F6]">İyi akşamlar</h1>
-        <p id="header-date" class="text-xs font-normal text-[#8E8E93] mt-0.5 tabular-nums">22 Kasım 2026 Pazar</p>
+        <p id="header-date" class="text-xs font-normal text-[#8E8E93] mt-0.5 tabular-nums">25 Kasım 2026 Çarşamba</p>
       </div>
       <div class="flex items-center gap-2">
         <!-- Dark Mode Toggle -->
@@ -161,6 +161,12 @@
 
     <!-- TAB 1: ANA SAYFA (Dashboard) -->
     <div id="tab-dashboard" class="tab-content space-y-4">
+
+      <!-- Day Switcher (Bugün / Dün) -->
+      <div class="grid grid-cols-2 gap-1 bg-white dark:bg-[#161923] p-1 rounded-xl border border-black/[0.04] dark:border-white/[0.06] shadow-sm">
+        <button onclick="setDashDay('today')" id="dash-day-today" class="py-1.5 rounded-lg text-xs font-medium bg-[#141824] dark:bg-[#F25C19] text-white transition-all shadow-sm">Bugün</button>
+        <button onclick="setDashDay('yesterday')" id="dash-day-yesterday" class="py-1.5 rounded-lg text-xs font-normal text-[#6E6E73] dark:text-[#9CA3AF] transition-all">Dün</button>
+      </div>
       
       <!-- Top Scores Section -->
       <div class="grid grid-cols-2 gap-3">
@@ -192,7 +198,7 @@
       <!-- Birleşik Skor Card -->
       <div class="bg-[#F25C19] text-white rounded-2xl p-4 shadow-sm flex items-center justify-between">
         <div>
-          <span class="text-xs font-normal text-white/80 block">Birleşik Günlük Skor</span>
+          <span id="dash-combined-label" class="text-xs font-normal text-white/80 block">Birleşik Günlük Skor</span>
           <div class="flex items-baseline gap-2 mt-1">
             <span id="dash-combined-score" class="text-3xl font-medium tabular-nums">0%</span>
             <span id="dash-combined-text" class="text-xs font-normal text-white/90">Henüz Veri Yok</span>
@@ -216,10 +222,10 @@
       <div class="bg-[#EEF4FF] dark:bg-[#131929] rounded-2xl p-4 border border-[#D0E2FF]/40 dark:border-white/[0.06] space-y-3">
         <div class="flex items-center justify-between">
           <div>
-            <h2 class="text-sm font-medium text-[#1D1D1F] dark:text-[#F3F4F6]">Günlük Görevler</h2>
-            <p class="text-[11px] font-normal text-[#6E6E73] dark:text-[#9CA3AF]">Alışkanlıklar, planlanan işler ve hatırlatıcılar</p>
+            <h2 id="tasks-section-title" class="text-sm font-medium text-[#1D1D1F] dark:text-[#F3F4F6]">Günlük Görevler</h2>
+            <p id="tasks-section-subtitle" class="text-[11px] font-normal text-[#6E6E73] dark:text-[#9CA3AF]">Alışkanlıklar, planlanan işler ve hatırlatıcılar</p>
           </div>
-          <button onclick="openAddTaskModal()" class="px-3 py-1.5 rounded-xl bg-[#141824] dark:bg-[#F25C19] active:bg-[#2C3246] text-white text-xs font-normal flex items-center gap-1.5 transition-colors shadow-sm">
+          <button id="btn-add-task" onclick="openAddTaskModal()" class="px-3 py-1.5 rounded-xl bg-[#141824] dark:bg-[#F25C19] active:bg-[#2C3246] text-white text-xs font-normal flex items-center gap-1.5 transition-colors shadow-sm">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>
             <span>Ekle</span>
           </button>
@@ -240,14 +246,17 @@
         <div id="dash-goals-list" class="space-y-2"></div>
       </div>
 
-      <!-- Gün Sonu Değerlendirme (With Photo Support) -->
+      <!-- Gün Sonu Değerlendirme -->
       <div class="bg-white dark:bg-[#161923] rounded-2xl p-4 shadow-sm border border-black/[0.03] dark:border-white/[0.06] space-y-4">
         <div class="flex items-center justify-between">
           <div>
-            <h2 class="text-sm font-medium text-[#1D1D1F] dark:text-[#F3F4F6]">Gün Sonu Değerlendirme</h2>
-            <p class="text-[11px] font-normal text-[#8E8E93]">Bugünkü modunu, notunu ve fotoğrafını kaydet</p>
+            <h2 id="eval-section-title" class="text-sm font-medium text-[#1D1D1F] dark:text-[#F3F4F6]">Gün Sonu Değerlendirme</h2>
+            <p id="eval-section-subtitle" class="text-[11px] font-normal text-[#8E8E93]">Bugünkü modunu, notunu ve fotoğrafını kaydet</p>
           </div>
-          <span class="text-[10px] text-[#8E8E93] tabular-nums">Her gün 23:30</span>
+          <button onclick="exportItemToICS({ uid: 'eval-daily-2330', title: 'Gün Sonu Değerlendirme', timeStr: '23:30', desc: 'Bugünü puanlamayı ve kısa bir not bırakmayı unutma.', isDaily: true })" class="flex items-center gap-1 text-[10px] text-[#8E8E93] hover:text-[#F25C19] transition-colors tabular-nums" title="Her gün 23:30 için iPhone Takvime ekle">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            <span>23:30</span>
+          </button>
         </div>
 
         <!-- 5 Vector SVG Mood Faces -->
@@ -335,12 +344,12 @@
 
     </div>
 
-    <!-- TAB 2: ALIŞKANLIKLAR (Edit + Drag-and-Drop Reorder + Add/Remove) -->
+    <!-- TAB 2: ALIŞKANLIKLAR -->
     <div id="tab-habits" class="tab-content hidden space-y-4">
       <div class="flex items-center justify-between mb-2">
         <div>
           <h2 class="text-lg font-medium text-[#1D1D1F] dark:text-[#F3F4F6]">Alışkanlıklar</h2>
-          <p class="text-xs font-normal text-[#8E8E93]">Sürükleyerek sırala, düzenle veya yeni ekle</p>
+          <p class="text-xs font-normal text-[#8E8E93]">Sürükleyerek sırala, düzenle veya takvime ekle</p>
         </div>
         <button onclick="openAddHabitModal()" class="px-3 py-1.5 rounded-xl bg-[#141824] dark:bg-[#F25C19] active:bg-[#2C3246] text-white text-xs font-normal flex items-center gap-1.5 transition-colors shadow-sm">
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>
@@ -385,7 +394,7 @@
           <button onclick="setAnalysisRange('custom')" data-range="custom" class="range-btn py-1.5 rounded-lg text-[11px] font-normal transition-all">Özel</button>
         </div>
 
-        <!-- Custom Date Range Inputs (Validated) -->
+        <!-- Custom Date Range Inputs -->
         <div id="custom-range-box" class="hidden bg-white dark:bg-[#161923] rounded-xl p-3 border border-black/[0.04] dark:border-white/[0.06] grid grid-cols-2 gap-2 text-xs">
           <div>
             <label class="block text-[10px] text-[#8E8E93] mb-1">Başlangıç</label>
@@ -398,7 +407,7 @@
         </div>
       </div>
 
-      <!-- Selected Day Summary Card (Now displays saved photo too) -->
+      <!-- Selected Day Summary Card -->
       <div id="analysis-detail-card" class="bg-white dark:bg-[#161923] rounded-2xl p-4 shadow-sm border border-black/[0.03] dark:border-white/[0.06] space-y-2.5">
         <div class="flex items-center justify-between">
           <span id="analysis-detail-date" class="text-xs font-medium text-[#1D1D1F] dark:text-[#F3F4F6] tabular-nums">Bir gün seçin</span>
@@ -495,6 +504,52 @@
       <button onclick="saveOnboardingName()" class="w-full py-3 rounded-2xl bg-[#141824] dark:bg-[#F25C19] active:opacity-90 text-white text-xs font-medium transition-opacity shadow-sm">
         Devam Et
       </button>
+    </div>
+  </div>
+
+  <!-- HABIT CALENDAR OPTIONS MODAL (Daily / Date Range / Remove) -->
+  <div id="modal-habit-calendar" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
+    <div class="bg-white dark:bg-[#161923] w-full max-w-md rounded-t-2xl sm:rounded-2xl p-5 space-y-4">
+      <div class="flex items-center justify-between border-b border-black/[0.06] dark:border-white/[0.08] pb-3">
+        <div>
+          <h3 class="text-sm font-medium text-[#1D1D1F] dark:text-[#F3F4F6]">Takvim Hatırlatıcı</h3>
+          <p id="habit-cal-subtitle" class="text-[11px] text-[#8E8E93] mt-0.5 tabular-nums"></p>
+        </div>
+        <button onclick="closeModal('modal-habit-calendar')" class="text-[#8E8E93] hover:text-[#1D1D1F] dark:hover:text-white">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div class="grid grid-cols-2 gap-1.5 bg-[#F5F5F7] dark:bg-[#1C202E] p-1 rounded-xl">
+          <button type="button" onclick="setHabitCalMode('forever')" id="habit-cal-btn-forever" class="py-2 rounded-lg text-[11px] font-medium bg-[#141824] dark:bg-[#F25C19] text-white transition-all">Her Gün (Süresiz)</button>
+          <button type="button" onclick="setHabitCalMode('range')" id="habit-cal-btn-range" class="py-2 rounded-lg text-[11px] font-normal text-[#6E6E73] dark:text-[#9CA3AF] transition-all">Tarih Aralığı</button>
+        </div>
+
+        <div id="habit-cal-range-box" class="hidden grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-[10px] text-[#8E8E93] mb-1">Başlangıç Tarihi</label>
+            <input id="habit-cal-start" type="date" onchange="onHabitCalDateChange('start')" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[#1D1D1F] dark:text-[#F3F4F6] border border-black/[0.04] dark:border-white/[0.08] text-[11px] tabular-nums">
+          </div>
+          <div>
+            <label class="block text-[10px] text-[#8E8E93] mb-1">Bitiş Tarihi</label>
+            <input id="habit-cal-end" type="date" onchange="onHabitCalDateChange('end')" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[#1D1D1F] dark:text-[#F3F4F6] border border-black/[0.04] dark:border-white/[0.08] text-[11px] tabular-nums">
+          </div>
+        </div>
+
+        <p class="text-[10px] text-[#8E8E93] leading-relaxed">
+          Seçtiğin günlere tam saatinde çalan iPhone Takvim bildirimi eklenir. İstediğinde alttaki butonla veya iPhone Takvim'den tüm seriyi silebilirsin.
+        </p>
+      </div>
+
+      <div class="space-y-2 pt-1">
+        <button onclick="confirmHabitCalendarExport()" class="w-full py-2.5 rounded-xl bg-[#141824] dark:bg-[#F25C19] text-white text-xs font-medium shadow-sm">
+          Takvime Ekle (.ics)
+        </button>
+        <button onclick="cancelHabitCalendarExport()" class="w-full py-2.5 rounded-xl bg-red-50 dark:bg-red-950/30 text-[#FF3B30] border border-red-100 dark:border-red-900/40 text-xs font-normal">
+          Takvimden Kaldır (.ics)
+        </button>
+      </div>
     </div>
   </div>
 
@@ -595,7 +650,9 @@
         </div>
         <div>
           <label class="block text-[#8E8E93] mb-1">Alt Aşamalar (Her satıra bir adet)</label>
-          <textarea id="input-goal-milestones" rows="3" placeholder="Kelime ezberle&#10;Grammar tekrar et&#10;Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[#1D1D1F] dark:text-[#F3F4F6] border border-black/[0.04] dark:border-white/[0.08] focus:outline-none focus:ring-1 focus:ring-[#141824] resize-none"></textarea>
+          <textarea id="input-goal-milestones" rows="3" placeholder="Kelime ezberle
+Grammar tekrar et
+Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[#1D1D1F] dark:text-[#F3F4F6] border border-black/[0.04] dark:border-white/[0.08] focus:outline-none focus:ring-1 focus:ring-[#141824] resize-none"></textarea>
         </div>
       </div>
 
@@ -635,6 +692,9 @@
               <span id="toggle-sound-dot" class="w-4 h-4 rounded-full bg-white absolute top-0.5 right-0.5 transition-all"></span>
             </button>
           </div>
+          <p class="text-[10px] text-[#8E8E93] leading-relaxed">
+            iPhone kapalıyken de tam saatinde bildirim almak için alışkanlıkların ve hedeflerin yanındaki takvim ikonundan iPhone Takvime ekleyebilirsin.
+          </p>
           <div class="flex gap-2 pt-1">
             <button onclick="requestNotificationPermission()" class="flex-1 py-2 rounded-lg bg-white dark:bg-[#161923] border border-black/[0.06] dark:border-white/[0.08] text-[#1D1D1F] dark:text-[#F3F4F6] flex items-center justify-center gap-1.5 shadow-sm">
               <span>Bildirim İzni Ver</span>
@@ -680,12 +740,15 @@
   <!-- PWA & Application Logic -->
   <script>
     const STORAGE_KEY = 'gunluk_takip_pwa_v2';
+    let selectedDashDay = 'today'; // 'today' | 'yesterday'
     let selectedAnalysisDate = null;
     let analysisRange = '3m';
     let customStartDate = '';
     let customEndDate = '';
     let editingHabitId = null;
     let pendingDailyPhoto = null;
+    let activeCalendarHabitId = null;
+    let habitCalMode = 'forever';
 
     let appState = {
       initialized: false,
@@ -744,6 +807,22 @@
       return formatLocalDate(d);
     }
 
+    function getDateStrDaysAhead(daysAhead) {
+      const d = new Date();
+      d.setDate(d.getDate() + daysAhead);
+      return formatLocalDate(d);
+    }
+
+    function getActiveDashDateStr() {
+      return selectedDashDay === 'yesterday' ? getDateStrDaysAgo(1) : getTodayStr();
+    }
+
+    function setDashDay(day) {
+      selectedDashDay = day;
+      pendingDailyPhoto = null;
+      renderDashboard();
+    }
+
     function loadState() {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
@@ -761,6 +840,7 @@
       applyTheme();
       renderApp();
       checkOnboarding();
+      checkScheduledTasks();
     }
 
     function checkOnboarding() {
@@ -972,7 +1052,7 @@
     function registerServiceWorker() {
       if ('serviceWorker' in navigator) {
         const swCode = `
-          const CACHE_NAME = 'gunluk-takip-v6';
+          const CACHE_NAME = 'gunluk-takip-v9';
           self.addEventListener('install', e => {
             e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(['./index.html'])));
             self.skipWaiting();
@@ -1029,21 +1109,21 @@
     }
 
     // -------------------------------------------------------------
-    // DASHBOARD & SCORES RENDER
+    // DASHBOARD & SCORES RENDER (Supports Bugün & Dün)
     // -------------------------------------------------------------
     let currentSelectedMood = null;
     let currentSelectedRating = null;
 
-    function getTodayTaskStats() {
-      const todayStr = getTodayStr();
-      const tasks = appState.tasks || [];
+    function getTaskStatsForDate(dateStr) {
+      const isToday = dateStr === getTodayStr();
+      const tasks = isToday ? (appState.tasks || []) : [];
       const habits = appState.habits || [];
 
       const taskTotalPts = tasks.reduce((sum, t) => sum + (t.points || 10), 0);
       const taskDonePts = tasks.filter(t => t.completed).reduce((sum, t) => sum + (t.points || 10), 0);
 
       const habitTotalPts = habits.length * 10;
-      const habitDoneCount = habits.filter(h => h.checkIns && h.checkIns[todayStr]).length;
+      const habitDoneCount = habits.filter(h => h.checkIns && h.checkIns[dateStr]).length;
       const habitDonePts = habitDoneCount * 10;
 
       const totalPoints = taskTotalPts + habitTotalPts;
@@ -1055,11 +1135,10 @@
       return { score, completedCount, totalCount };
     }
 
-    function getTodayCombinedScore() {
-      const { score: taskScore } = getTodayTaskStats();
-      const todayStr = getTodayStr();
-      const todayEval = appState.evaluations[todayStr];
-      const moodRating = todayEval ? todayEval.rating : null;
+    function getCombinedScoreForDate(dateStr) {
+      const { score: taskScore } = getTaskStatsForDate(dateStr);
+      const ev = appState.evaluations[dateStr];
+      const moodRating = ev ? ev.rating : null;
 
       if (moodRating) {
         return Math.round((taskScore * 0.6) + (moodRating * 10 * 0.4));
@@ -1067,17 +1146,51 @@
       return taskScore;
     }
 
+    function getTodayTaskStats() {
+      return getTaskStatsForDate(getTodayStr());
+    }
+
+    function getTodayCombinedScore() {
+      return getCombinedScoreForDate(getTodayStr());
+    }
+
     function renderDashboard() {
-      const { score: taskScore, completedCount, totalCount } = getTodayTaskStats();
+      const activeDate = getActiveDashDateStr();
+      const isYesterday = selectedDashDay === 'yesterday';
+
+      // Update Day Switcher UI
+      const btnToday = document.getElementById('dash-day-today');
+      const btnYesterday = document.getElementById('dash-day-yesterday');
+      if (isYesterday) {
+        btnYesterday.className = 'py-1.5 rounded-lg text-xs font-medium bg-[#141824] dark:bg-[#F25C19] text-white transition-all shadow-sm';
+        btnToday.className = 'py-1.5 rounded-lg text-xs font-normal text-[#6E6E73] dark:text-[#9CA3AF] transition-all';
+      } else {
+        btnToday.className = 'py-1.5 rounded-lg text-xs font-medium bg-[#141824] dark:bg-[#F25C19] text-white transition-all shadow-sm';
+        btnYesterday.className = 'py-1.5 rounded-lg text-xs font-normal text-[#6E6E73] dark:text-[#9CA3AF] transition-all';
+      }
+
+      // Update section titles for clarity
+      document.getElementById('dash-combined-label').textContent = isYesterday ? 'Dünkü Birleşik Skor' : 'Birleşik Günlük Skor';
+      document.getElementById('tasks-section-title').textContent = isYesterday ? 'Dünkü Alışkanlıklar' : 'Günlük Görevler';
+      document.getElementById('tasks-section-subtitle').textContent = isYesterday
+        ? 'Dün tamamladığın alışkanlıkları düzenleyebilirsin'
+        : 'Alışkanlıklar, planlanan işler ve hatırlatıcılar';
+      document.getElementById('btn-add-task').classList.toggle('hidden', isYesterday);
+
+      document.getElementById('eval-section-title').textContent = isYesterday ? 'Dünkü Değerlendirme' : 'Gün Sonu Değerlendirme';
+      document.getElementById('eval-section-subtitle').textContent = isYesterday
+        ? 'Dünkü modunu, notunu ve fotoğrafını kaydet'
+        : 'Bugünkü modunu, notunu ve fotoğrafını kaydet';
+
+      const { score: taskScore, completedCount, totalCount } = getTaskStatsForDate(activeDate);
       document.getElementById('dash-task-score').textContent = `${taskScore}%`;
       document.getElementById('dash-task-count').textContent = `${completedCount}/${totalCount}`;
 
-      const todayStr = getTodayStr();
-      const todayEval = appState.evaluations[todayStr];
-      const moodRating = todayEval ? todayEval.rating : null;
+      const activeEval = appState.evaluations[activeDate];
+      const moodRating = activeEval ? activeEval.rating : null;
       document.getElementById('dash-mood-score').textContent = moodRating ? `${moodRating}/10` : '-';
 
-      const combinedScore = getTodayCombinedScore();
+      const combinedScore = getCombinedScoreForDate(activeDate);
       document.getElementById('dash-combined-score').textContent = `${combinedScore}%`;
       document.getElementById('dash-combined-badge').textContent = `${combinedScore}%`;
 
@@ -1093,12 +1206,12 @@
       renderDashboardGoals();
       renderRatingButtons();
 
-      if (todayEval) {
-        selectMood(todayEval.mood, false);
-        selectRating(todayEval.rating, false);
-        document.getElementById('daily-note').value = todayEval.note || '';
-        if (pendingDailyPhoto === null && todayEval.photo) {
-          pendingDailyPhoto = todayEval.photo;
+      if (activeEval) {
+        selectMood(activeEval.mood, false);
+        selectRating(activeEval.rating, false);
+        document.getElementById('daily-note').value = activeEval.note || '';
+        if (pendingDailyPhoto === null && activeEval.photo) {
+          pendingDailyPhoto = activeEval.photo;
         }
       } else {
         currentSelectedMood = null;
@@ -1113,7 +1226,7 @@
       const container = document.getElementById('weekly-bars-container');
       container.innerHTML = '';
       const dayNames = ['Paz', 'Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt'];
-      const todayStr = getTodayStr();
+      const activeDate = getActiveDashDateStr();
 
       for (let i = 6; i >= 0; i--) {
         const d = new Date();
@@ -1122,11 +1235,14 @@
         const dayLabel = dayNames[d.getDay()];
 
         let heightPct = 0;
-        if (dStr === todayStr) {
-          heightPct = getTodayCombinedScore();
+        if (i === 0 || i === 1) {
+          heightPct = getCombinedScoreForDate(dStr);
         } else if (appState.evaluations[dStr]) {
           const ev = appState.evaluations[dStr];
           heightPct = ev.combinedScore != null ? ev.combinedScore : (ev.rating ? ev.rating * 10 : 0);
+        } else {
+          const hStats = getTaskStatsForDate(dStr);
+          if (hStats.completedCount > 0) heightPct = hStats.score;
         }
 
         const wrapper = document.createElement('div');
@@ -1142,7 +1258,7 @@
         barBg.appendChild(barFill);
 
         const label = document.createElement('span');
-        label.className = `text-[10px] font-normal ${dStr === todayStr ? 'text-[#F25C19] font-medium' : 'text-[#8E8E93]'}`;
+        label.className = `text-[10px] font-normal ${dStr === activeDate ? 'text-[#F25C19] font-medium' : 'text-[#8E8E93]'}`;
         label.textContent = dayLabel;
 
         wrapper.appendChild(barBg);
@@ -1154,18 +1270,19 @@
     function renderTasksList() {
       const container = document.getElementById('tasks-list');
       container.innerHTML = '';
-      const todayStr = getTodayStr();
+      const activeDate = getActiveDashDateStr();
+      const isYesterday = selectedDashDay === 'yesterday';
       const habits = appState.habits || [];
-      const tasks = appState.tasks || [];
+      const tasks = isYesterday ? [] : (appState.tasks || []);
 
       if (habits.length === 0 && tasks.length === 0) {
-        container.innerHTML = '<p class="text-xs text-[#8E8E93] text-center py-4 italic">Henüz eklenmiş görev veya alışkanlık yok.</p>';
+        container.innerHTML = `<p class="text-xs text-[#8E8E93] text-center py-4 italic">${isYesterday ? 'Henüz eklenmiş alışkanlık yok.' : 'Henüz eklenmiş görev veya alışkanlık yok.'}</p>`;
         return;
       }
 
-      // 1. Habits as Daily Tasks
+      // 1. Habits for activeDate (Today or Yesterday)
       habits.forEach(h => {
-        const isDone = !!(h.checkIns && h.checkIns[todayStr]);
+        const isDone = !!(h.checkIns && h.checkIns[activeDate]);
         const item = document.createElement('div');
         item.className = `flex items-center justify-between p-3 rounded-xl bg-white dark:bg-[#161923] border border-black/[0.04] dark:border-white/[0.06] transition-all ${isDone ? 'opacity-60' : ''}`;
 
@@ -1185,9 +1302,9 @@
               </div>
             </div>
           </div>
-          ${h.time ? `
+          ${(!isYesterday && h.time) ? `
           <div class="flex items-center gap-1">
-            <button onclick="exportItemToICS('${escapeAttr(h.title)}', '${h.time}', 'Alışkanlık Hatırlatıcı')" class="p-1.5 text-[#8E8E93] hover:text-[#1D1D1F] dark:hover:text-white transition-colors" title="iCal Takvime Ekle">
+            <button onclick="openHabitCalendarModal('${h.id}')" class="p-1.5 text-[#8E8E93] hover:text-[#F25C19] transition-colors" title="Takvim Hatırlatıcı Seçenekleri">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
             </button>
           </div>` : ''}
@@ -1195,7 +1312,7 @@
         container.appendChild(item);
       });
 
-      // 2. Manual Tasks
+      // 2. Manual Tasks (Today only)
       tasks.forEach(t => {
         const item = document.createElement('div');
         item.className = `flex items-center justify-between p-3 rounded-xl bg-white dark:bg-[#161923] border border-black/[0.04] dark:border-white/[0.06] transition-all ${t.completed ? 'opacity-60' : ''}`;
@@ -1214,7 +1331,7 @@
             </div>
           </div>
           <div class="flex items-center gap-1">
-            <button onclick="exportTaskToICS('${t.id}')" class="p-1.5 text-[#8E8E93] hover:text-[#1D1D1F] dark:hover:text-white transition-colors" title="iCal Takvime Ekle">
+            <button onclick="exportTaskToICS('${t.id}')" class="p-1.5 text-[#8E8E93] hover:text-[#F25C19] transition-colors" title="iPhone Takvime Ekle">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
             </button>
             <button onclick="deleteTask('${t.id}')" class="p-1.5 text-[#8E8E93] hover:text-[#FF3B30] transition-colors" title="Sil">
@@ -1272,6 +1389,7 @@
     }
 
     function checkAllCompletedAndCelebrate(wasAllDone) {
+      if (selectedDashDay !== 'today') return;
       const stats = getTodayTaskStats();
       if (!wasAllDone && stats.totalCount > 0 && stats.completedCount === stats.totalCount) {
         triggerCelebration();
@@ -1296,44 +1414,202 @@
       showToast('Görev silindi');
     }
 
-    function exportItemToICS(title, timeStr, desc) {
+    // -------------------------------------------------------------
+    // UNIVERSAL .ICS CALENDAR EXPORT (Tasks, Habits, Goals, Cancel)
+    // -------------------------------------------------------------
+    function exportItemToICS({ uid, title, dateStr = null, timeStr = '09:00', desc = '', isDaily = false, untilDateStr = null, isCancel = false }) {
       const now = new Date();
-      let start = new Date(now);
+      const start = dateStr ? new Date(dateStr + 'T00:00:00') : new Date(now);
       if (timeStr && timeStr.includes(':')) {
         const [hh, mm] = timeStr.split(':').map(Number);
         start.setHours(hh, mm, 0, 0);
+      } else {
+        start.setHours(9, 0, 0, 0);
       }
-      const end = new Date(start.getTime() + 30 * 60000);
-      const fmt = d => d.toISOString().replace(/-|:|\.\d+/g, '').slice(0, 15) + 'Z';
+      const end = new Date(start.getTime() + 15 * 60000);
 
-      const icsData =
-`BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//Günlük Takip PWA//TR
-BEGIN:VEVENT
-UID:${Date.now()}@gunluktakip.app
-DTSTAMP:${fmt(now)}
-DTSTART:${fmt(start)}
-DTEND:${fmt(end)}
-SUMMARY:${title}
-DESCRIPTION:${desc}
-END:VEVENT
-END:VCALENDAR`;
+      const pad = n => String(n).padStart(2, '0');
+      const fmtLocal = d => `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}00`;
+      const fmtUTC = d => d.toISOString().replace(/-|:|\.\d+/g, '').slice(0, 15) + 'Z';
 
+      const eventUid = `${uid || Date.now()}@gunluktakip.app`;
+      const lines = [
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//Gunluk Takip PWA//TR',
+        isCancel ? 'METHOD:CANCEL' : 'METHOD:PUBLISH',
+        'BEGIN:VEVENT',
+        `UID:${eventUid}`,
+        `DTSTAMP:${fmtUTC(now)}`,
+        `DTSTART:${fmtLocal(start)}`,
+        `DTEND:${fmtLocal(end)}`,
+        `SUMMARY:${title}`,
+        `DESCRIPTION:${desc}`,
+        isCancel ? 'STATUS:CANCELLED' : 'STATUS:CONFIRMED',
+        isCancel ? 'SEQUENCE:2' : 'SEQUENCE:0'
+      ];
+
+      if (!isCancel && isDaily) {
+        if (untilDateStr) {
+          const untilDate = new Date(untilDateStr + 'T23:59:59');
+          lines.push(`RRULE:FREQ=DAILY;UNTIL=${fmtUTC(untilDate)}`);
+        } else {
+          lines.push('RRULE:FREQ=DAILY');
+        }
+      }
+
+      if (!isCancel) {
+        lines.push(
+          'BEGIN:VALARM',
+          'TRIGGER:PT0M',
+          'ACTION:DISPLAY',
+          `DESCRIPTION:${title}`,
+          'END:VALARM'
+        );
+      }
+
+      lines.push('END:VEVENT', 'END:VCALENDAR');
+
+      const icsData = lines.join('\r\n');
       const blob = new Blob([icsData], { type: 'text/calendar;charset=utf-8' });
       const link = document.createElement('a');
       link.href = window.URL.createObjectURL(blob);
-      link.setAttribute('download', `${title}.ics`);
+      link.setAttribute('download', `${title}${isCancel ? '_iptal' : ''}.ics`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      showToast('Takvim dosyası indirildi');
     }
 
     function exportTaskToICS(id) {
       const task = appState.tasks.find(t => t.id === id);
       if (!task) return;
-      exportItemToICS(task.title, task.time, `Günlük Takip PWA Hatırlatıcı (+${task.points} Puan)`);
+      exportItemToICS({
+        uid: 'task-' + task.id,
+        title: task.title,
+        timeStr: task.time || '09:00',
+        desc: `Günlük Takip Hatırlatıcı (+${task.points} Puan)`,
+        isDaily: false
+      });
+      showToast('Takvim bildirimi indirildi');
+    }
+
+    function exportGoalToICS(id) {
+      const goal = appState.goals.find(g => g.id === id);
+      if (!goal || !goal.targetDate) return;
+      exportItemToICS({
+        uid: 'goal-' + goal.id,
+        title: `Hedef: ${goal.title}`,
+        dateStr: goal.targetDate,
+        timeStr: '09:00',
+        desc: `Günlük Takip Hedef Tarihi (${goal.targetDate})`,
+        isDaily: false
+      });
+      showToast('Hedef takvime aktarıldı');
+    }
+
+    // Habit Calendar Modal Logic
+    function openHabitCalendarModal(id) {
+      const h = appState.habits.find(item => item.id === id);
+      if (!h) return;
+      activeCalendarHabitId = id;
+      document.getElementById('habit-cal-subtitle').textContent = `${h.title} • Saat ${h.time || '09:00'}`;
+
+      const startEl = document.getElementById('habit-cal-start');
+      const endEl = document.getElementById('habit-cal-end');
+      startEl.value = getTodayStr();
+      endEl.value = getDateStrDaysAhead(30);
+      startEl.max = endEl.value;
+      endEl.min = startEl.value;
+
+      setHabitCalMode('forever');
+      document.getElementById('modal-habit-calendar').classList.remove('hidden');
+    }
+
+    function setHabitCalMode(mode) {
+      habitCalMode = mode;
+      const btnForever = document.getElementById('habit-cal-btn-forever');
+      const btnRange = document.getElementById('habit-cal-btn-range');
+      const rangeBox = document.getElementById('habit-cal-range-box');
+
+      if (mode === 'forever') {
+        btnForever.className = 'py-2 rounded-lg text-[11px] font-medium bg-[#141824] dark:bg-[#F25C19] text-white transition-all';
+        btnRange.className = 'py-2 rounded-lg text-[11px] font-normal text-[#6E6E73] dark:text-[#9CA3AF] transition-all';
+        rangeBox.classList.add('hidden');
+      } else {
+        btnRange.className = 'py-2 rounded-lg text-[11px] font-medium bg-[#141824] dark:bg-[#F25C19] text-white transition-all';
+        btnForever.className = 'py-2 rounded-lg text-[11px] font-normal text-[#6E6E73] dark:text-[#9CA3AF] transition-all';
+        rangeBox.classList.remove('hidden');
+      }
+    }
+
+    function onHabitCalDateChange(changedField) {
+      const startEl = document.getElementById('habit-cal-start');
+      const endEl = document.getElementById('habit-cal-end');
+      let s = startEl.value;
+      let e = endEl.value;
+
+      if (s && e && s > e) {
+        if (changedField === 'start') {
+          s = e;
+          startEl.value = s;
+        } else {
+          e = s;
+          endEl.value = e;
+        }
+        showToast('Başlangıç tarihi bitiş tarihinden ileri olamaz');
+      }
+      if (e) startEl.max = e;
+      if (s) endEl.min = s;
+    }
+
+    function confirmHabitCalendarExport() {
+      const h = appState.habits.find(item => item.id === activeCalendarHabitId);
+      if (!h) return;
+
+      if (habitCalMode === 'range') {
+        const s = document.getElementById('habit-cal-start').value;
+        const e = document.getElementById('habit-cal-end').value;
+        if (!s || !e) {
+          showToast('Lütfen tarih aralığı seçin');
+          return;
+        }
+        exportItemToICS({
+          uid: 'habit-' + h.id,
+          title: h.title,
+          dateStr: s,
+          timeStr: h.time || '09:00',
+          desc: `Günlük Alışkanlık (${s} - ${e})`,
+          isDaily: true,
+          untilDateStr: e
+        });
+        showToast('Seçili tarih aralığı takvime aktarıldı');
+      } else {
+        exportItemToICS({
+          uid: 'habit-' + h.id,
+          title: h.title,
+          dateStr: getTodayStr(),
+          timeStr: h.time || '09:00',
+          desc: 'Günlük Alışkanlık Hatırlatıcı',
+          isDaily: true
+        });
+        showToast('Her gün tekrarlı takvim bildirimi indirildi');
+      }
+      closeModal('modal-habit-calendar');
+    }
+
+    function cancelHabitCalendarExport() {
+      const h = appState.habits.find(item => item.id === activeCalendarHabitId);
+      if (!h) return;
+      exportItemToICS({
+        uid: 'habit-' + h.id,
+        title: h.title,
+        dateStr: getTodayStr(),
+        timeStr: h.time || '09:00',
+        desc: 'Alışkanlık iptal edildi',
+        isCancel: true
+      });
+      closeModal('modal-habit-calendar');
+      showToast('Takvim kaldırma dosyası indirildi');
     }
 
     // -------------------------------------------------------------
@@ -1429,12 +1705,12 @@ END:VCALENDAR`;
 
     function saveDailyEvaluation() {
       const note = document.getElementById('daily-note').value;
-      const todayStr = getTodayStr();
-      const { score: taskScore } = getTodayTaskStats();
+      const activeDate = getActiveDashDateStr();
+      const { score: taskScore } = getTaskStatsForDate(activeDate);
       const ratingVal = currentSelectedRating || 7;
       const combined = Math.round((taskScore * 0.6) + (ratingVal * 10 * 0.4));
 
-      appState.evaluations[todayStr] = {
+      appState.evaluations[activeDate] = {
         mood: currentSelectedMood || 3,
         rating: ratingVal,
         taskScore: taskScore,
@@ -1444,11 +1720,11 @@ END:VCALENDAR`;
       };
 
       saveState();
-      showToast('Günlük değerlendirme kaydedildi');
+      showToast(selectedDashDay === 'yesterday' ? 'Dünkü değerlendirme kaydedildi' : 'Günlük değerlendirme kaydedildi');
     }
 
     // -------------------------------------------------------------
-    // HABITS TAB (Edit + Drag-and-Drop Reorder + Delete)
+    // HABITS TAB
     // -------------------------------------------------------------
     const HABIT_DOT_COLORS = {
       navy: 'bg-[#141824] dark:bg-[#60A5FA]',
@@ -1503,6 +1779,10 @@ END:VCALENDAR`;
             </div>
           </div>
           <div class="flex items-center gap-0.5 shrink-0">
+            ${h.time ? `
+            <button onclick="openHabitCalendarModal('${h.id}')" class="p-2 text-[#8E8E93] hover:text-[#F25C19] transition-colors" title="Takvim Hatırlatıcı Seçenekleri">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            </button>` : ''}
             <button onclick="openEditHabitModal('${h.id}')" class="p-2 text-[#8E8E93] hover:text-[#1D1D1F] dark:hover:text-white transition-colors" title="Düzenle">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path stroke-linecap="round" stroke-linejoin="round" d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
             </button>
@@ -1519,7 +1799,6 @@ END:VCALENDAR`;
       });
     }
 
-    // Pointer-based Drag & Drop (Works on iOS Touch + Desktop Mouse)
     let dragState = null;
 
     function startHabitDrag(e, card) {
@@ -1588,18 +1867,26 @@ END:VCALENDAR`;
     }
 
     function toggleHabitCheckIn(id) {
-      const before = getTodayTaskStats();
+      const activeDate = getActiveDashDateStr();
+      const before = getTaskStatsForDate(activeDate);
       const wasAllDone = before.totalCount > 0 && before.completedCount === before.totalCount;
 
       const habit = appState.habits.find(h => h.id === id);
       if (habit) {
         if (!habit.checkIns) habit.checkIns = {};
-        const todayStr = getTodayStr();
-        if (habit.checkIns[todayStr]) {
-          delete habit.checkIns[todayStr];
+        if (habit.checkIns[activeDate]) {
+          delete habit.checkIns[activeDate];
         } else {
-          habit.checkIns[todayStr] = true;
+          habit.checkIns[activeDate] = true;
         }
+
+        // Keep saved evaluation scores in sync if an evaluation exists for activeDate
+        if (appState.evaluations[activeDate]) {
+          const updatedStats = getTaskStatsForDate(activeDate);
+          appState.evaluations[activeDate].taskScore = updatedStats.score;
+          appState.evaluations[activeDate].combinedScore = getCombinedScoreForDate(activeDate);
+        }
+
         saveState();
         checkAllCompletedAndCelebrate(wasAllDone);
       }
@@ -1612,7 +1899,7 @@ END:VCALENDAR`;
     }
 
     // -------------------------------------------------------------
-    // ANALYSIS TAB (Validated Date Ranges + Main & Habit Heatmaps)
+    // ANALYSIS TAB
     // -------------------------------------------------------------
     function syncCustomDateLimits() {
       const startEl = document.getElementById('custom-date-start');
@@ -1737,14 +2024,15 @@ END:VCALENDAR`;
       container.innerHTML = '';
 
       const todayStr = getTodayStr();
+      const yesterdayStr = getDateStrDaysAgo(1);
 
       dates.forEach(dStr => {
         const evalData = appState.evaluations[dStr];
         let val = null;
 
         if (colorType === 'orange') {
-          if (dStr === todayStr) {
-            const liveTask = getTodayTaskStats().score;
+          if (dStr === todayStr || dStr === yesterdayStr) {
+            const liveTask = getTaskStatsForDate(dStr).score;
             val = liveTask > 0 ? liveTask : (evalData?.taskScore ?? (evalData?.rating ? evalData.rating * 10 : null));
           } else if (evalData) {
             val = evalData.taskScore != null ? evalData.taskScore : (evalData.rating ? evalData.rating * 10 : null);
@@ -1752,8 +2040,8 @@ END:VCALENDAR`;
         } else if (colorType === 'indigo') {
           if (evalData && evalData.rating) val = evalData.rating * 10;
         } else {
-          if (dStr === todayStr) {
-            const liveComb = getTodayCombinedScore();
+          if (dStr === todayStr || dStr === yesterdayStr) {
+            const liveComb = getCombinedScoreForDate(dStr);
             val = liveComb > 0 ? liveComb : (evalData?.combinedScore ?? (evalData?.rating ? evalData.rating * 10 : null));
           } else if (evalData) {
             val = evalData.combinedScore != null ? evalData.combinedScore : (evalData.rating ? evalData.rating * 10 : null);
@@ -1923,9 +2211,15 @@ END:VCALENDAR`;
               <h3 class="text-sm font-medium text-[#1D1D1F] dark:text-[#F3F4F6]">${escapeHtml(g.title)}</h3>
               ${daysLeftText ? `<span class="text-[10px] text-[#F25C19] font-normal tabular-nums">${daysLeftText}</span>` : ''}
             </div>
-            <button onclick="deleteGoal('${g.id}')" class="text-[#8E8E93] hover:text-[#FF3B30]">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-            </button>
+            <div class="flex items-center gap-1">
+              ${g.targetDate ? `
+              <button onclick="exportGoalToICS('${g.id}')" class="p-1.5 text-[#8E8E93] hover:text-[#F25C19] transition-colors" title="Hedef tarihini iPhone Takvime ekle">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              </button>` : ''}
+              <button onclick="deleteGoal('${g.id}')" class="p-1.5 text-[#8E8E93] hover:text-[#FF3B30] transition-colors" title="Hedefi Sil">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+              </button>
+            </div>
           </div>
 
           <div class="space-y-1">
@@ -2077,8 +2371,25 @@ END:VCALENDAR`;
     }
 
     // -------------------------------------------------------------
-    // NOTIFICATIONS SETTINGS & HANDLERS
+    // NOTIFICATIONS SETTINGS & iOS-SAFE DELIVERY
     // -------------------------------------------------------------
+    function sendSystemNotification(title, body) {
+      if (!('Notification' in window) || Notification.permission !== 'granted') return;
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.ready.then(reg => {
+          if (reg && reg.showNotification) {
+            reg.showNotification(title, { body });
+          } else {
+            new Notification(title, { body });
+          }
+        }).catch(() => {
+          try { new Notification(title, { body }); } catch (e) {}
+        });
+      } else {
+        try { new Notification(title, { body }); } catch (e) {}
+      }
+    }
+
     function updateNotificationUI() {
       const badge = document.getElementById('notif-status-badge');
       if (badge) {
@@ -2141,9 +2452,7 @@ END:VCALENDAR`;
         playSoftChime();
       }
       showToast('Test bildirimi gönderildi');
-      if ('Notification' in window && Notification.permission === 'granted') {
-        new Notification('Günlük Takip', { body: 'Bildirimler sorunsuz çalışıyor!' });
-      }
+      sendSystemNotification('Günlük Takip', 'Bildirimler sorunsuz çalışıyor!');
     }
 
     // -------------------------------------------------------------
@@ -2185,6 +2494,7 @@ END:VCALENDAR`;
 
     function performFactoryReset() {
       const keepDark = !!appState.settings?.darkMode;
+      selectedDashDay = 'today';
       selectedAnalysisDate = null;
       pendingDailyPhoto = '';
       appState = {
@@ -2204,7 +2514,7 @@ END:VCALENDAR`;
     }
 
     // -------------------------------------------------------------
-    // AUDIO CHIME & TIME SCHEDULER (Tasks, Habits & Daily 23:30)
+    // AUDIO CHIME & IMPROVED TIME SCHEDULER
     // -------------------------------------------------------------
     function playSoftChime() {
       try {
@@ -2229,48 +2539,73 @@ END:VCALENDAR`;
       } catch (e) {}
     }
 
-    function checkScheduledTasks() {
-      const now = new Date();
-      const currentHHMM = now.toTimeString().slice(0, 5);
-      const todayStr = getTodayStr();
+    function timeToMinutes(hhmm) {
+      if (!hhmm || !hhmm.includes(':')) return null;
+      const [h, m] = hhmm.split(':').map(Number);
+      if (isNaN(h) || isNaN(m)) return null;
+      return h * 60 + m;
+    }
 
-      appState.tasks.forEach(t => {
-        if (t.time === currentHHMM && t.lastNotifiedDate !== todayStr) {
-          if (appState.settings?.soundEnabled !== false) playSoftChime();
-          showToast(`Hatırlatıcı: ${t.title}`);
-          t.lastNotifiedDate = todayStr;
-
-          if ("Notification" in window && Notification.permission === "granted") {
-            new Notification("Günlük Takip", { body: t.title });
-          }
-        }
-      });
-
-      appState.habits.forEach(h => {
-        if (h.time === currentHHMM && h.lastNotifiedDate !== todayStr) {
-          if (appState.settings?.soundEnabled !== false) playSoftChime();
-          showToast(`Alışkanlık: ${h.title}`);
-          h.lastNotifiedDate = todayStr;
-
-          if ("Notification" in window && Notification.permission === "granted") {
-            new Notification("Alışkanlık Hatırlatıcı", { body: h.title });
-          }
-        }
-      });
-
-      if (currentHHMM === '23:30') {
-        const lastEvalNotif = localStorage.getItem('last_eval_notif_date');
-        if (lastEvalNotif !== todayStr) {
-          localStorage.setItem('last_eval_notif_date', todayStr);
-          if (appState.settings?.soundEnabled !== false) playSoftChime();
-          showToast('Gün sonu değerlendirmeni yapmayı unutma!');
-          if ("Notification" in window && Notification.permission === "granted") {
-            new Notification("Gün Sonu Değerlendirme", { body: "Bugünü puanlamayı ve kısa bir not bırakmayı unutma." });
-          }
-        }
+    function getNotifiedSet(todayStr) {
+      try {
+        return JSON.parse(localStorage.getItem('notified_' + todayStr) || '{}');
+      } catch (e) {
+        return {};
       }
     }
-    setInterval(checkScheduledTasks, 30000);
+
+    function markNotified(todayStr, key) {
+      const set = getNotifiedSet(todayStr);
+      set[key] = true;
+      localStorage.setItem('notified_' + todayStr, JSON.stringify(set));
+    }
+
+    function checkScheduledTasks() {
+      const now = new Date();
+      const nowMins = now.getHours() * 60 + now.getMinutes();
+      const todayStr = getTodayStr();
+      const notified = getNotifiedSet(todayStr);
+
+      (appState.tasks || []).forEach(t => {
+        if (!t.time || t.completed) return;
+        const targetMins = timeToMinutes(t.time);
+        const key = 'task_' + t.id + '_' + t.time;
+        if (targetMins !== null && nowMins >= targetMins && nowMins <= targetMins + 30 && !notified[key]) {
+          markNotified(todayStr, key);
+          if (appState.settings?.soundEnabled !== false) playSoftChime();
+          showToast(`Hatırlatıcı: ${t.title}`);
+          sendSystemNotification('Günlük Takip', t.title);
+        }
+      });
+
+      (appState.habits || []).forEach(h => {
+        if (!h.time) return;
+        if (h.checkIns && h.checkIns[todayStr]) return;
+        const targetMins = timeToMinutes(h.time);
+        const key = 'habit_' + h.id + '_' + h.time;
+        if (targetMins !== null && nowMins >= targetMins && nowMins <= targetMins + 30 && !notified[key]) {
+          markNotified(todayStr, key);
+          if (appState.settings?.soundEnabled !== false) playSoftChime();
+          showToast(`Alışkanlık: ${h.title}`);
+          sendSystemNotification('Alışkanlık Hatırlatıcı', h.title);
+        }
+      });
+
+      const evalTarget = 23 * 60 + 30;
+      const evalKey = 'eval_2330';
+      if (nowMins >= evalTarget && nowMins <= evalTarget + 29 && !notified[evalKey] && !appState.evaluations[todayStr]) {
+        markNotified(todayStr, evalKey);
+        if (appState.settings?.soundEnabled !== false) playSoftChime();
+        showToast('Gün sonu değerlendirmeni yapmayı unutma!');
+        sendSystemNotification('Gün Sonu Değerlendirme', 'Bugünü puanlamayı ve kısa bir not bırakmayı unutma.');
+      }
+    }
+
+    setInterval(checkScheduledTasks, 15000);
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) checkScheduledTasks();
+    });
+    window.addEventListener('focus', checkScheduledTasks);
 
     let toastTimer = null;
     function showToast(msg) {
@@ -2284,11 +2619,7 @@ END:VCALENDAR`;
     }
 
     function escapeHtml(str) {
-      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    }
-
-    function escapeAttr(str) {
-      return String(str).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+      return String(str).replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>').replace(/"/g, '"');
     }
 
     function renderApp() {
