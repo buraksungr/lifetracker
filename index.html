@@ -128,7 +128,7 @@
     <header class="flex items-center justify-between mb-5">
       <div>
         <h1 id="header-greeting" class="text-2xl font-medium tracking-tight text-[#1D1D1F] dark:text-[#F3F4F6]">İyi akşamlar</h1>
-        <p id="header-date" class="text-xs font-normal text-[#8E8E93] mt-0.5 tabular-nums">25 Kasım 2026 Çarşamba</p>
+        <p id="header-date" class="text-xs font-normal text-[#8E8E93] mt-0.5 tabular-nums"></p>
       </div>
       <div class="flex items-center gap-2">
         <!-- Dark Mode Toggle -->
@@ -376,7 +376,23 @@
       <div id="goals-list" class="space-y-3"></div>
     </div>
 
-    <!-- TAB 4: ANALİZ -->
+    <!-- TAB 4: ETKİNLİKLER (Events Countdown) -->
+    <div id="tab-events" class="tab-content hidden space-y-4">
+      <div class="flex items-center justify-between mb-2">
+        <div>
+          <h2 class="text-lg font-medium text-[#1D1D1F] dark:text-[#F3F4F6]">Etkinlikler</h2>
+          <p class="text-xs font-normal text-[#8E8E93]">Yaklaşan planlar ve geri sayım</p>
+        </div>
+        <button onclick="openAddEventModal()" class="px-3 py-1.5 rounded-xl bg-[#141824] dark:bg-[#F25C19] active:bg-[#2C3246] text-white text-xs font-normal flex items-center gap-1.5 transition-colors shadow-sm">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>
+          <span>Etkinlik Ekle</span>
+        </button>
+      </div>
+
+      <div id="events-list" class="space-y-3"></div>
+    </div>
+
+    <!-- TAB 5: ANALİZ -->
     <div id="tab-analysis" class="tab-content hidden space-y-4">
       <div>
         <h2 class="text-lg font-medium text-[#1D1D1F] dark:text-[#F3F4F6]">Analiz</h2>
@@ -456,15 +472,15 @@
 
   </main>
 
-  <!-- BOTTOM NAVIGATION BAR (Order: Ana Sayfa - Alışkanlıklar - Hedefler - Analiz) -->
-  <nav class="bottom-nav-fix fixed bottom-0 left-0 right-0 w-full z-40 bg-[#141824] text-white rounded-t-2xl shadow-2xl border-t border-white/10 pt-2.5 px-2">
-    <div class="grid grid-cols-4 items-center max-w-md mx-auto">
+  <!-- BOTTOM NAVIGATION BAR (5 Tabs: Ana Sayfa - Alışkanlıklar - Hedefler - Etkinlikler - Analiz) -->
+  <nav class="bottom-nav-fix fixed bottom-0 left-0 right-0 w-full z-40 bg-[#141824] text-white rounded-t-2xl shadow-2xl border-t border-white/10 pt-2.5 px-1">
+    <div class="grid grid-cols-5 items-center max-w-md mx-auto">
       <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-tab-btn flex flex-col items-center justify-center gap-1 py-1.5 text-white transition-opacity">
         <svg class="w-5 h-5 stroke-current fill-none stroke-[1.8]" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
           <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
           <polyline points="9 22 9 12 15 12 15 22"/>
         </svg>
-        <span class="text-[11px] leading-none whitespace-nowrap tracking-tight">Ana Sayfa</span>
+        <span class="text-[10px] leading-none whitespace-nowrap tracking-tight">Ana Sayfa</span>
       </button>
 
       <button onclick="switchTab('habits')" id="nav-habits" class="nav-tab-btn flex flex-col items-center justify-center gap-1 py-1.5 text-white/50 hover:text-white transition-opacity">
@@ -472,14 +488,24 @@
           <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
           <polyline points="22 4 12 14.01 9 11.01"/>
         </svg>
-        <span class="text-[11px] leading-none whitespace-nowrap tracking-tight">Alışkanlıklar</span>
+        <span class="text-[10px] leading-none whitespace-nowrap tracking-tight">Alışkanlık</span>
       </button>
 
       <button onclick="switchTab('goals')" id="nav-goals" class="nav-tab-btn flex flex-col items-center justify-center gap-1 py-1.5 text-white/50 hover:text-white transition-opacity">
         <svg class="w-5 h-5 stroke-current fill-none stroke-[1.8]" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
           <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
         </svg>
-        <span class="text-[11px] leading-none whitespace-nowrap tracking-tight">Hedefler</span>
+        <span class="text-[10px] leading-none whitespace-nowrap tracking-tight">Hedefler</span>
+      </button>
+
+      <button onclick="switchTab('events')" id="nav-events" class="nav-tab-btn flex flex-col items-center justify-center gap-1 py-1.5 text-white/50 hover:text-white transition-opacity">
+        <svg class="w-5 h-5 stroke-current fill-none stroke-[1.8]" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+          <line x1="16" y1="2" x2="16" y2="6"/>
+          <line x1="8" y1="2" x2="8" y2="6"/>
+          <line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+        <span class="text-[10px] leading-none whitespace-nowrap tracking-tight">Etkinlikler</span>
       </button>
 
       <button onclick="switchTab('analysis')" id="nav-analysis" class="nav-tab-btn flex flex-col items-center justify-center gap-1 py-1.5 text-white/50 hover:text-white transition-opacity">
@@ -488,7 +514,7 @@
           <line x1="12" y1="20" x2="12" y2="4"/>
           <line x1="6" y1="20" x2="6" y2="14"/>
         </svg>
-        <span class="text-[11px] leading-none whitespace-nowrap tracking-tight">Analiz</span>
+        <span class="text-[10px] leading-none whitespace-nowrap tracking-tight">Analiz</span>
       </button>
     </div>
   </nav>
@@ -507,7 +533,7 @@
     </div>
   </div>
 
-  <!-- HABIT CALENDAR OPTIONS MODAL (Daily / Date Range / Remove) -->
+  <!-- HABIT CALENDAR OPTIONS MODAL -->
   <div id="modal-habit-calendar" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
     <div class="bg-white dark:bg-[#161923] w-full max-w-md rounded-t-2xl sm:rounded-2xl p-5 space-y-4">
       <div class="flex items-center justify-between border-b border-black/[0.06] dark:border-white/[0.08] pb-3">
@@ -589,7 +615,7 @@
     </div>
   </div>
 
-  <!-- Add / Edit Habit Modal -->
+  <!-- Add / Edit Habit Modal (With Daily Target Count) -->
   <div id="modal-habit" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
     <div class="bg-white dark:bg-[#161923] w-full max-w-md rounded-t-2xl sm:rounded-2xl p-5 space-y-4">
       <div class="flex items-center justify-between border-b border-black/[0.06] dark:border-white/[0.08] pb-3">
@@ -602,21 +628,25 @@
       <div class="space-y-3 text-xs">
         <div>
           <label class="block text-[#8E8E93] mb-1">Alışkanlık Başlığı</label>
-          <input id="input-habit-title" type="text" placeholder="Örn: 2 Litre Su İç" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[#1D1D1F] dark:text-[#F3F4F6] border border-black/[0.04] dark:border-white/[0.08] focus:outline-none focus:ring-1 focus:ring-[#141824]">
+          <input id="input-habit-title" type="text" placeholder="Örn: Su İç" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[#1D1D1F] dark:text-[#F3F4F6] border border-black/[0.04] dark:border-white/[0.08] focus:outline-none focus:ring-1 focus:ring-[#141824]">
         </div>
-        <div class="grid grid-cols-2 gap-2">
+        <div class="grid grid-cols-3 gap-2">
+          <div>
+            <label class="block text-[#8E8E93] mb-1">Günde Kaç Kez</label>
+            <input id="input-habit-target" type="number" min="1" max="20" value="1" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[#1D1D1F] dark:text-[#F3F4F6] border border-black/[0.04] dark:border-white/[0.08] focus:outline-none focus:ring-1 focus:ring-[#141824] tabular-nums">
+          </div>
           <div>
             <label class="block text-[#8E8E93] mb-1">Renk Teması</label>
             <select id="input-habit-theme" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[#1D1D1F] dark:text-[#F3F4F6] border border-black/[0.04] dark:border-white/[0.08] focus:outline-none focus:ring-1 focus:ring-[#141824]">
-              <option value="navy">Lacivert (Navy)</option>
-              <option value="emerald">Zümrüt (Emerald)</option>
-              <option value="amber">Kehribar (Amber)</option>
-              <option value="orange">Turuncu (Orange)</option>
-              <option value="pink">Pembe (Pink)</option>
+              <option value="navy">Lacivert</option>
+              <option value="emerald">Zümrüt</option>
+              <option value="amber">Kehribar</option>
+              <option value="orange">Turuncu</option>
+              <option value="pink">Pembe</option>
             </select>
           </div>
           <div>
-            <label class="block text-[#8E8E93] mb-1">Hatırlatıcı Saati (Opsiyonel)</label>
+            <label class="block text-[#8E8E93] mb-1">Saat (Opsiyonel)</label>
             <input id="input-habit-time" type="time" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[#1D1D1F] dark:text-[#F3F4F6] border border-black/[0.04] dark:border-white/[0.08] focus:outline-none focus:ring-1 focus:ring-[#141824] tabular-nums">
           </div>
         </div>
@@ -663,6 +693,40 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
     </div>
   </div>
 
+  <!-- Add Event Modal -->
+  <div id="modal-event" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
+    <div class="bg-white dark:bg-[#161923] w-full max-w-md rounded-t-2xl sm:rounded-2xl p-5 space-y-4">
+      <div class="flex items-center justify-between border-b border-black/[0.06] dark:border-white/[0.08] pb-3">
+        <h3 class="text-sm font-medium text-[#1D1D1F] dark:text-[#F3F4F6]">Yeni Etkinlik Ekle</h3>
+        <button onclick="closeModal('modal-event')" class="text-[#8E8E93]">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block text-[#8E8E93] mb-1">Etkinlik Adı</label>
+          <input id="input-event-title" type="text" placeholder="Örn: Halı saha maçı, Konser, Akşam yemeği" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[#1D1D1F] dark:text-[#F3F4F6] border border-black/[0.04] dark:border-white/[0.08] focus:outline-none focus:ring-1 focus:ring-[#141824]">
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-[#8E8E93] mb-1">Tarih</label>
+            <input id="input-event-date" type="date" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[#1D1D1F] dark:text-[#F3F4F6] border border-black/[0.04] dark:border-white/[0.08] focus:outline-none focus:ring-1 focus:ring-[#141824] tabular-nums">
+          </div>
+          <div>
+            <label class="block text-[#8E8E93] mb-1">Saat</label>
+            <input id="input-event-time" type="time" value="12:00" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[#1D1D1F] dark:text-[#F3F4F6] border border-black/[0.04] dark:border-white/[0.08] focus:outline-none focus:ring-1 focus:ring-[#141824] tabular-nums">
+          </div>
+        </div>
+      </div>
+
+      <div class="flex gap-2 pt-2">
+        <button onclick="closeModal('modal-event')" class="flex-1 py-2.5 rounded-xl bg-[#E5E5EA] dark:bg-[#232838] text-[#1D1D1F] dark:text-[#F3F4F6] text-xs font-normal">İptal</button>
+        <button onclick="saveEvent()" class="flex-1 py-2.5 rounded-xl bg-[#141824] dark:bg-[#F25C19] text-white text-xs font-normal">Kaydet</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Settings Modal -->
   <div id="modal-settings" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
     <div class="bg-white dark:bg-[#161923] w-full max-w-md rounded-t-2xl sm:rounded-2xl p-5 space-y-4 max-h-[90vh] overflow-y-auto">
@@ -693,7 +757,7 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
             </button>
           </div>
           <p class="text-[10px] text-[#8E8E93] leading-relaxed">
-            iPhone kapalıyken de tam saatinde bildirim almak için alışkanlıkların ve hedeflerin yanındaki takvim ikonundan iPhone Takvime ekleyebilirsin.
+            iPhone kapalıyken de tam saatinde bildirim almak için alışkanlıkların, hedeflerin ve etkinliklerin yanındaki takvim ikonundan iPhone Takvime ekleyebilirsin.
           </p>
           <div class="flex gap-2 pt-1">
             <button onclick="requestNotificationPermission()" class="flex-1 py-2 rounded-lg bg-white dark:bg-[#161923] border border-black/[0.06] dark:border-white/[0.08] text-[#1D1D1F] dark:text-[#F3F4F6] flex items-center justify-center gap-1.5 shadow-sm">
@@ -720,7 +784,7 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
 
         <div class="p-3 bg-red-50 dark:bg-red-950/30 rounded-xl border border-red-100 dark:border-red-900/40 space-y-2">
           <span class="font-medium text-[#FF3B30] block">Tüm Verileri Sıfırla</span>
-          <p class="text-[11px] text-[#8E8E93]">Tüm görev, alışkanlık, skor ve geçmiş kayıtlarınızı kalıcı olarak siler ve uygulamayı sıfırlar.</p>
+          <p class="text-[11px] text-[#8E8E93]">Tüm görev, alışkanlık, skor, etkinlik ve geçmiş kayıtlarınızı kalıcı olarak siler.</p>
           <button onclick="performFactoryReset()" class="w-full py-2 rounded-lg bg-[#FF3B30] active:bg-red-700 text-white font-medium shadow-sm transition-colors">
             Tüm Verileri Sıfırla
           </button>
@@ -740,7 +804,7 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
   <!-- PWA & Application Logic -->
   <script>
     const STORAGE_KEY = 'gunluk_takip_pwa_v2';
-    let selectedDashDay = 'today'; // 'today' | 'yesterday'
+    let selectedDashDay = 'today';
     let selectedAnalysisDate = null;
     let analysisRange = '3m';
     let customStartDate = '';
@@ -757,6 +821,7 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
       tasks: [],
       habits: [],
       goals: [],
+      events: [],
       evaluations: {}
     };
 
@@ -770,10 +835,10 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
         { id: 't3', title: 'Günlük Rapor Hazırla', points: 25, time: '17:00', completed: false }
       ],
       habits: [
-        { id: 'h1', title: 'Su İçme (2.5L)', theme: 'navy', time: '10:00', checkIns: {} },
-        { id: 'h2', title: 'Kitap Okuma', theme: 'emerald', time: '21:30', checkIns: {} },
-        { id: 'h3', title: 'Egzersiz / Spor', theme: 'amber', time: '', checkIns: {} },
-        { id: 'h4', title: 'Yazılım Çalışma', theme: 'orange', time: '', checkIns: {} }
+        { id: 'h1', title: 'Su İçme (2.5L)', theme: 'navy', time: '10:00', dailyTarget: 3, checkIns: {} },
+        { id: 'h2', title: 'Kitap Okuma', theme: 'emerald', time: '21:30', dailyTarget: 1, checkIns: {} },
+        { id: 'h3', title: 'Egzersiz / Spor', theme: 'amber', time: '', dailyTarget: 1, checkIns: {} },
+        { id: 'h4', title: 'Yazılım Çalışma', theme: 'orange', time: '', dailyTarget: 1, checkIns: {} }
       ],
       goals: [
         {
@@ -787,8 +852,27 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
           ]
         }
       ],
+      events: [],
       evaluations: {}
     };
+
+    // Multi-count Habit Helpers (Backwards compatible with boolean true)
+    function getHabitTarget(h) {
+      const t = parseInt(h.dailyTarget);
+      return (t && t > 1) ? t : 1;
+    }
+
+    function getHabitCount(h, dateStr) {
+      if (!h.checkIns || !h.checkIns[dateStr]) return 0;
+      const val = h.checkIns[dateStr];
+      if (val === true) return getHabitTarget(h);
+      if (typeof val === 'number') return Math.max(0, val);
+      return 0;
+    }
+
+    function isHabitDone(h, dateStr) {
+      return getHabitCount(h, dateStr) >= getHabitTarget(h);
+    }
 
     function formatLocalDate(d) {
       const y = d.getFullYear();
@@ -830,6 +914,7 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
           appState = JSON.parse(stored);
           if (!appState.settings) appState.settings = { soundEnabled: true, darkMode: false };
           if (!appState.user) appState.user = { name: '', nameSet: false };
+          if (!Array.isArray(appState.events)) appState.events = [];
         } catch (e) {
           appState = defaultData;
         }
@@ -1052,7 +1137,7 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
     function registerServiceWorker() {
       if ('serviceWorker' in navigator) {
         const swCode = `
-          const CACHE_NAME = 'gunluk-takip-v9';
+          const CACHE_NAME = 'gunluk-takip-v10';
           self.addEventListener('install', e => {
             e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(['./index.html'])));
             self.skipWaiting();
@@ -1106,10 +1191,11 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
         activeBtn.classList.add('text-white');
       }
       document.getElementById('app-container').scrollTop = 0;
+      if (tabId === 'events') renderEvents();
     }
 
     // -------------------------------------------------------------
-    // DASHBOARD & SCORES RENDER (Supports Bugün & Dün)
+    // DASHBOARD & SCORES RENDER
     // -------------------------------------------------------------
     let currentSelectedMood = null;
     let currentSelectedRating = null;
@@ -1123,8 +1209,15 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
       const taskDonePts = tasks.filter(t => t.completed).reduce((sum, t) => sum + (t.points || 10), 0);
 
       const habitTotalPts = habits.length * 10;
-      const habitDoneCount = habits.filter(h => h.checkIns && h.checkIns[dateStr]).length;
-      const habitDonePts = habitDoneCount * 10;
+      let habitDoneCount = 0;
+      let habitDonePts = 0;
+
+      habits.forEach(h => {
+        const target = getHabitTarget(h);
+        const count = Math.min(getHabitCount(h, dateStr), target);
+        if (count >= target) habitDoneCount++;
+        habitDonePts += Math.round(10 * (count / target));
+      });
 
       const totalPoints = taskTotalPts + habitTotalPts;
       const completedPoints = taskDonePts + habitDonePts;
@@ -1158,7 +1251,6 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
       const activeDate = getActiveDashDateStr();
       const isYesterday = selectedDashDay === 'yesterday';
 
-      // Update Day Switcher UI
       const btnToday = document.getElementById('dash-day-today');
       const btnYesterday = document.getElementById('dash-day-yesterday');
       if (isYesterday) {
@@ -1169,7 +1261,6 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
         btnYesterday.className = 'py-1.5 rounded-lg text-xs font-normal text-[#6E6E73] dark:text-[#9CA3AF] transition-all';
       }
 
-      // Update section titles for clarity
       document.getElementById('dash-combined-label').textContent = isYesterday ? 'Dünkü Birleşik Skor' : 'Birleşik Günlük Skor';
       document.getElementById('tasks-section-title').textContent = isYesterday ? 'Dünkü Alışkanlıklar' : 'Günlük Görevler';
       document.getElementById('tasks-section-subtitle').textContent = isYesterday
@@ -1242,7 +1333,7 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
           heightPct = ev.combinedScore != null ? ev.combinedScore : (ev.rating ? ev.rating * 10 : 0);
         } else {
           const hStats = getTaskStatsForDate(dStr);
-          if (hStats.completedCount > 0) heightPct = hStats.score;
+          if (hStats.score > 0) heightPct = hStats.score;
         }
 
         const wrapper = document.createElement('div');
@@ -1280,34 +1371,44 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
         return;
       }
 
-      // 1. Habits for activeDate (Today or Yesterday)
+      // 1. Habits for activeDate (Supports single & multi-count)
       habits.forEach(h => {
-        const isDone = !!(h.checkIns && h.checkIns[activeDate]);
+        const target = getHabitTarget(h);
+        const count = getHabitCount(h, activeDate);
+        const isDone = count >= target;
         const item = document.createElement('div');
         item.className = `flex items-center justify-between p-3 rounded-xl bg-white dark:bg-[#161923] border border-black/[0.04] dark:border-white/[0.06] transition-all ${isDone ? 'opacity-60' : ''}`;
 
+        const checkboxInner = isDone
+          ? '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>'
+          : (target > 1 && count > 0 ? `<span class="text-[10px] font-medium text-[#F25C19] tabular-nums">${count}</span>` : '');
+
         item.innerHTML = `
-          <div class="flex items-center gap-3">
-            <button onclick="toggleHabitCheckIn('${h.id}')" class="w-5 h-5 rounded-md border flex items-center justify-center transition-colors ${isDone ? 'bg-[#F25C19] border-[#F25C19] text-white' : 'border-[#D1D1D6] dark:border-white/20 bg-white dark:bg-[#1C202E]'}">
-              ${isDone ? '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>' : ''}
+          <div class="flex items-center gap-3 min-w-0">
+            <button onclick="toggleHabitCheckIn('${h.id}')" class="w-5 h-5 shrink-0 rounded-md border flex items-center justify-center transition-colors ${isDone ? 'bg-[#F25C19] border-[#F25C19] text-white' : (count > 0 ? 'border-[#F25C19] bg-[#F25C19]/10' : 'border-[#D1D1D6] dark:border-white/20 bg-white dark:bg-[#1C202E]')}">
+              ${checkboxInner}
             </button>
-            <div>
+            <div class="min-w-0">
               <div class="flex items-center gap-1.5">
-                <span class="text-xs font-normal text-[#1D1D1F] dark:text-[#F3F4F6] ${isDone ? 'line-through text-[#8E8E93]' : ''}">${escapeHtml(h.title)}</span>
-                <span class="text-[9px] px-1.5 py-0.5 rounded-md bg-[#EEF4FF] dark:bg-white/10 text-[#5E5CE6] dark:text-[#A3D5FF]">Alışkanlık</span>
+                <span class="text-xs font-normal text-[#1D1D1F] dark:text-[#F3F4F6] truncate ${isDone ? 'line-through text-[#8E8E93]' : ''}">${escapeHtml(h.title)}</span>
+                <span class="text-[9px] px-1.5 py-0.5 rounded-md bg-[#EEF4FF] dark:bg-white/10 text-[#5E5CE6] dark:text-[#A3D5FF] shrink-0">Alışkanlık</span>
               </div>
               <div class="flex items-center gap-2 mt-0.5 text-[10px] text-[#8E8E93] tabular-nums">
                 <span>+10 Puan</span>
+                ${target > 1 ? `<span class="text-[#F25C19] font-medium">• ${count}/${target}</span>` : ''}
                 ${h.time ? `<span>• ${h.time}</span>` : ''}
               </div>
             </div>
           </div>
-          ${(!isYesterday && h.time) ? `
-          <div class="flex items-center gap-1">
+          <div class="flex items-center gap-1 shrink-0">
+            ${(target > 1 && count > 0) ? `
+            <button onclick="decrementHabitCheckIn('${h.id}')" class="w-6 h-6 rounded-lg bg-[#F5F5F7] dark:bg-[#1C202E] text-[#6E6E73] dark:text-[#9CA3AF] flex items-center justify-center text-xs font-medium active:scale-95" title="Azalt">−</button>
+            ` : ''}
+            ${(!isYesterday && h.time) ? `
             <button onclick="openHabitCalendarModal('${h.id}')" class="p-1.5 text-[#8E8E93] hover:text-[#F25C19] transition-colors" title="Takvim Hatırlatıcı Seçenekleri">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-            </button>
-          </div>` : ''}
+            </button>` : ''}
+          </div>
         `;
         container.appendChild(item);
       });
@@ -1415,7 +1516,7 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
     }
 
     // -------------------------------------------------------------
-    // UNIVERSAL .ICS CALENDAR EXPORT (Tasks, Habits, Goals, Cancel)
+    // UNIVERSAL .ICS CALENDAR EXPORT
     // -------------------------------------------------------------
     function exportItemToICS({ uid, title, dateStr = null, timeStr = '09:00', desc = '', isDaily = false, untilDateStr = null, isCancel = false }) {
       const now = new Date();
@@ -1505,6 +1606,20 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
         isDaily: false
       });
       showToast('Hedef takvime aktarıldı');
+    }
+
+    function exportEventToICS(id) {
+      const ev = (appState.events || []).find(e => e.id === id);
+      if (!ev || !ev.date) return;
+      exportItemToICS({
+        uid: 'event-' + ev.id,
+        title: ev.title,
+        dateStr: ev.date,
+        timeStr: ev.time || '12:00',
+        desc: `Etkinlik: ${ev.title}`,
+        isDaily: false
+      });
+      showToast('Etkinlik takvime aktarıldı');
     }
 
     // Habit Calendar Modal Logic
@@ -1753,7 +1868,8 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
 
       appState.habits.forEach((h, idx) => {
         const dotColor = HABIT_DOT_COLORS[h.theme] || HABIT_DOT_COLORS.navy;
-        const count = Object.keys(h.checkIns || {}).length;
+        const target = getHabitTarget(h);
+        const count = Object.keys(h.checkIns || {}).filter(d => getHabitCount(h, d) > 0).length;
 
         const card = document.createElement('div');
         card.setAttribute('data-habit-index', idx);
@@ -1774,7 +1890,8 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
               <p class="text-xs font-medium text-[#1D1D1F] dark:text-[#F3F4F6] truncate">${escapeHtml(h.title)}</p>
               <div class="flex items-center gap-2 mt-0.5 text-[10px] text-[#8E8E93] tabular-nums">
                 <span>Toplam: ${count} gün</span>
-                ${h.time ? `<span>• Saat ${h.time}</span>` : ''}
+                ${target > 1 ? `<span>• Günde ${target} kez</span>` : ''}
+                ${h.time ? `<span>• ${h.time}</span>` : ''}
               </div>
             </div>
           </div>
@@ -1874,13 +1991,17 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
       const habit = appState.habits.find(h => h.id === id);
       if (habit) {
         if (!habit.checkIns) habit.checkIns = {};
-        if (habit.checkIns[activeDate]) {
-          delete habit.checkIns[activeDate];
+        const target = getHabitTarget(habit);
+        const current = getHabitCount(habit, activeDate);
+
+        if (target === 1) {
+          if (current >= 1) delete habit.checkIns[activeDate];
+          else habit.checkIns[activeDate] = 1;
         } else {
-          habit.checkIns[activeDate] = true;
+          if (current >= target) delete habit.checkIns[activeDate];
+          else habit.checkIns[activeDate] = current + 1;
         }
 
-        // Keep saved evaluation scores in sync if an evaluation exists for activeDate
         if (appState.evaluations[activeDate]) {
           const updatedStats = getTaskStatsForDate(activeDate);
           appState.evaluations[activeDate].taskScore = updatedStats.score;
@@ -1892,10 +2013,137 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
       }
     }
 
+    function decrementHabitCheckIn(id) {
+      const activeDate = getActiveDashDateStr();
+      const habit = appState.habits.find(h => h.id === id);
+      if (!habit || !habit.checkIns) return;
+      const current = getHabitCount(habit, activeDate);
+      if (current <= 1) delete habit.checkIns[activeDate];
+      else habit.checkIns[activeDate] = current - 1;
+
+      if (appState.evaluations[activeDate]) {
+        const updatedStats = getTaskStatsForDate(activeDate);
+        appState.evaluations[activeDate].taskScore = updatedStats.score;
+        appState.evaluations[activeDate].combinedScore = getCombinedScoreForDate(activeDate);
+      }
+      saveState();
+    }
+
     function deleteHabit(id) {
       appState.habits = appState.habits.filter(h => h.id !== id);
       saveState();
       showToast('Alışkanlık silindi');
+    }
+
+    // -------------------------------------------------------------
+    // EVENTS TAB (Live Countdown: Gün / Saat / Dakika)
+    // -------------------------------------------------------------
+    function getEventCountdown(dateStr, timeStr) {
+      if (!dateStr) return { text: 'Tarih yok', passed: false, diffMs: Infinity };
+      const target = new Date(`${dateStr}T${timeStr || '00:00'}:00`);
+      const now = new Date();
+      const diffMs = target - now;
+
+      if (diffMs <= 0) {
+        return { text: 'Süresi doldu', passed: true, diffMs };
+      }
+
+      const totalMins = Math.floor(diffMs / 60000);
+      const days = Math.floor(totalMins / (60 * 24));
+      const hours = Math.floor((totalMins % (60 * 24)) / 60);
+      const mins = totalMins % 60;
+
+      const parts = [];
+      if (days > 0) parts.push(`${days} gün`);
+      if (hours > 0 || days > 0) parts.push(`${hours} saat`);
+      parts.push(`${mins} dk kaldı`);
+
+      return { text: parts.join(' '), passed: false, diffMs };
+    }
+
+    function renderEvents() {
+      const container = document.getElementById('events-list');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const events = (appState.events || []).slice().sort((a, b) => {
+        const da = new Date(`${a.date}T${a.time || '00:00'}:00`).getTime();
+        const db = new Date(`${b.date}T${b.time || '00:00'}:00`).getTime();
+        return da - db;
+      });
+
+      if (events.length === 0) {
+        container.innerHTML = '<p class="text-xs text-[#8E8E93] py-6 italic text-center">Henüz etkinlik eklenmedi.</p>';
+        return;
+      }
+
+      events.forEach(ev => {
+        const cd = getEventCountdown(ev.date, ev.time);
+        const formattedDate = ev.date ? new Date(ev.date + 'T00:00:00').toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+
+        const card = document.createElement('div');
+        card.className = `bg-white dark:bg-[#161923] rounded-2xl p-4 shadow-sm border border-black/[0.03] dark:border-white/[0.06] space-y-2.5 ${cd.passed ? 'opacity-60' : ''}`;
+
+        card.innerHTML = `
+          <div class="flex items-start justify-between gap-2">
+            <div class="min-w-0">
+              <h3 class="text-sm font-medium text-[#1D1D1F] dark:text-[#F3F4F6] truncate">${escapeHtml(ev.title)}</h3>
+              <p class="text-[11px] text-[#8E8E93] mt-0.5 tabular-nums">${formattedDate}${ev.time ? ` • ${ev.time}` : ''}</p>
+            </div>
+            <div class="flex items-center gap-1 shrink-0">
+              <button onclick="exportEventToICS('${ev.id}')" class="p-1.5 text-[#8E8E93] hover:text-[#F25C19] transition-colors" title="iPhone Takvime Ekle">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              </button>
+              <button onclick="deleteEvent('${ev.id}')" class="p-1.5 text-[#8E8E93] hover:text-[#FF3B30] transition-colors" title="Sil">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="flex items-center justify-between pt-1">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-medium tabular-nums ${cd.passed ? 'bg-[#E5E5EA] dark:bg-[#232838] text-[#8E8E93]' : 'bg-[#F25C19]/12 text-[#F25C19]'}">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <span>${cd.text}</span>
+            </span>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function openAddEventModal() {
+      document.getElementById('input-event-title').value = '';
+      document.getElementById('input-event-date').value = getTodayStr();
+      document.getElementById('input-event-time').value = '12:00';
+      document.getElementById('modal-event').classList.remove('hidden');
+    }
+
+    function saveEvent() {
+      const title = document.getElementById('input-event-title').value.trim();
+      const date = document.getElementById('input-event-date').value;
+      const time = document.getElementById('input-event-time').value || '12:00';
+
+      if (!title || !date) {
+        showToast('Lütfen etkinlik adı ve tarih girin');
+        return;
+      }
+
+      if (!Array.isArray(appState.events)) appState.events = [];
+      appState.events.push({
+        id: 'ev_' + Date.now(),
+        title,
+        date,
+        time
+      });
+
+      closeModal('modal-event');
+      saveState();
+      showToast('Etkinlik eklendi');
+    }
+
+    function deleteEvent(id) {
+      appState.events = (appState.events || []).filter(e => e.id !== id);
+      saveState();
+      showToast('Etkinlik silindi');
     }
 
     // -------------------------------------------------------------
@@ -2094,8 +2342,8 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
       const { containerClass, cellSizeClass } = getHeatmapLayout(dates.length);
 
       habits.forEach(h => {
-        const checkIns = h.checkIns || {};
-        const doneInRange = dates.filter(d => !!checkIns[d]).length;
+        const target = getHabitTarget(h);
+        const doneInRange = dates.filter(d => isHabitDone(h, d)).length;
         const fillColor = HABIT_HEAT_COLORS[h.theme] || HABIT_HEAT_COLORS.navy;
         const dotColor = HABIT_DOT_COLORS[h.theme] || HABIT_DOT_COLORS.navy;
 
@@ -2116,7 +2364,11 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
         grid.className = containerClass;
 
         dates.forEach(dStr => {
-          const active = !!checkIns[dStr];
+          const count = getHabitCount(h, dStr);
+          let bgClass = 'bg-[#E5E5EA]/50 dark:bg-[#232838]';
+          if (count >= target) bgClass = fillColor;
+          else if (count > 0) bgClass = `${fillColor} opacity-45`;
+
           const isSelected = selectedAnalysisDate === dStr;
           const selectedClass = isSelected
             ? 'ring-2 ring-[#141824] dark:ring-white ring-offset-1 ring-offset-white dark:ring-offset-[#161923] z-10'
@@ -2124,7 +2376,7 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
 
           const cell = document.createElement('button');
           cell.title = dStr;
-          cell.className = `${cellSizeClass} ${active ? fillColor : 'bg-[#E5E5EA]/50 dark:bg-[#232838]'} ${selectedClass} transition-transform active:scale-95`;
+          cell.className = `${cellSizeClass} ${bgClass} ${selectedClass} transition-transform active:scale-95`;
           cell.onclick = () => selectAnalysisDay(dStr);
           grid.appendChild(cell);
         });
@@ -2139,7 +2391,7 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
       selectedAnalysisDate = dateStr;
       const evalData = appState.evaluations[dateStr];
       const habits = appState.habits || [];
-      const habitsDone = habits.filter(h => h.checkIns && h.checkIns[dateStr]).length;
+      const habitsDone = habits.filter(h => isHabitDone(h, dateStr)).length;
 
       document.getElementById('analysis-detail-date').textContent = dateStr;
 
@@ -2266,6 +2518,7 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
       editingHabitId = null;
       document.getElementById('modal-habit-title').textContent = 'Yeni Alışkanlık Ekle';
       document.getElementById('input-habit-title').value = '';
+      document.getElementById('input-habit-target').value = 1;
       document.getElementById('input-habit-theme').value = 'navy';
       document.getElementById('input-habit-time').value = '';
       document.getElementById('modal-habit').classList.remove('hidden');
@@ -2277,6 +2530,7 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
       editingHabitId = id;
       document.getElementById('modal-habit-title').textContent = 'Alışkanlığı Düzenle';
       document.getElementById('input-habit-title').value = h.title || '';
+      document.getElementById('input-habit-target').value = getHabitTarget(h);
       document.getElementById('input-habit-theme').value = h.theme || 'navy';
       document.getElementById('input-habit-time').value = h.time || '';
       document.getElementById('modal-habit').classList.remove('hidden');
@@ -2315,6 +2569,7 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
 
     function saveHabit() {
       const title = document.getElementById('input-habit-title').value.trim();
+      const dailyTarget = Math.max(1, Math.min(20, parseInt(document.getElementById('input-habit-target').value) || 1));
       const theme = document.getElementById('input-habit-theme').value;
       const time = document.getElementById('input-habit-time').value;
 
@@ -2324,6 +2579,7 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
         const h = appState.habits.find(item => item.id === editingHabitId);
         if (h) {
           h.title = title;
+          h.dailyTarget = dailyTarget;
           h.theme = theme;
           h.time = time;
         }
@@ -2335,6 +2591,7 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
         appState.habits.push({
           id: 'h_' + Date.now(),
           title,
+          dailyTarget,
           theme,
           time,
           checkIns: {}
@@ -2480,6 +2737,7 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
           if (imported && typeof imported === 'object') {
             appState = imported;
             if (!appState.settings) appState.settings = { soundEnabled: true, darkMode: false };
+            if (!Array.isArray(appState.events)) appState.events = [];
             applyTheme();
             saveState();
             closeModal('modal-settings');
@@ -2504,6 +2762,7 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
         tasks: [],
         habits: [],
         goals: [],
+        events: [],
         evaluations: {}
       };
       saveState();
@@ -2580,7 +2839,7 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
 
       (appState.habits || []).forEach(h => {
         if (!h.time) return;
-        if (h.checkIns && h.checkIns[todayStr]) return;
+        if (isHabitDone(h, todayStr)) return;
         const targetMins = timeToMinutes(h.time);
         const key = 'habit_' + h.id + '_' + h.time;
         if (targetMins !== null && nowMins >= targetMins && nowMins <= targetMins + 30 && !notified[key]) {
@@ -2601,11 +2860,21 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
       }
     }
 
-    setInterval(checkScheduledTasks, 15000);
+    setInterval(() => {
+      checkScheduledTasks();
+      renderEvents();
+    }, 15000);
+
     document.addEventListener('visibilitychange', () => {
-      if (!document.hidden) checkScheduledTasks();
+      if (!document.hidden) {
+        checkScheduledTasks();
+        renderEvents();
+      }
     });
-    window.addEventListener('focus', checkScheduledTasks);
+    window.addEventListener('focus', () => {
+      checkScheduledTasks();
+      renderEvents();
+    });
 
     let toastTimer = null;
     function showToast(msg) {
@@ -2627,6 +2896,7 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
       renderDashboard();
       renderHabits();
       renderGoals();
+      renderEvents();
       renderAnalysis();
     }
 
