@@ -1,3 +1,8 @@
+Üç sorunu da düzelttim, uygulamanın geri kalanını birebir korudum:
+ * Isı Haritası Renk Ayrımı: Tamamlanan günler doygun tam renkte, yarım kalan günler ise çok daha açık pastel tonda (belirgin kontrastla) görünecek şekilde ayrıştırıldı. Görev, Moral ve Birleşik Skor haritalarındaki düşük/orta/yüksek renk farkları da netleştirildi.
+ * Sabit (Sticky) Tarih ve Detay Kartı: Analiz sekmesindeki seçili gün kartı ekranın üstüne sabitlendi (sticky). Aşağıdaki alışkanlık ısı haritalarına kaydırıp herhangi bir güne dokunduğunda tarih ve detaylar hemen gözünün önünde kalır; yukarı çıkmana gerek kalmaz.
+ * Eski Günlerin İlerlemesi Korundu: Bir alışkanlığın "Günde Kaç Kez" sayısını sonradan 2–3–4 yaptığında, bugünden önceki tüm kayıtlı günler o günkü eski hedefine kilitlenir (targetByDate). Böylece geçmiş günlerin tamamlanma durumu ve ısı haritası rengi bozulmaz, yalnızca bugünden itibaren yeni hedef geçerli olur.
+Aşağıdaki kodu kopyalayıp GitHub'daki index.html dosyanın üzerine yapıştırabilirsin:
 <!DOCTYPE html>
 <html lang="tr" class="h-full">
 <head>
@@ -423,15 +428,15 @@
         </div>
       </div>
 
-      <!-- Selected Day Summary Card -->
-      <div id="analysis-detail-card" class="bg-white dark:bg-[#161923] rounded-2xl p-4 shadow-sm border border-black/[0.03] dark:border-white/[0.06] space-y-2.5">
+      <!-- Sticky Selected Day Summary Card -->
+      <div id="analysis-detail-card" class="sticky top-2 z-20 bg-white/95 dark:bg-[#161923]/95 backdrop-blur-md rounded-2xl p-3.5 shadow-md border border-black/[0.06] dark:border-white/[0.08] space-y-2">
         <div class="flex items-center justify-between">
           <span id="analysis-detail-date" class="text-xs font-medium text-[#1D1D1F] dark:text-[#F3F4F6] tabular-nums">Bir gün seçin</span>
           <span id="analysis-detail-score" class="text-xs font-medium text-[#F25C19] tabular-nums">-</span>
         </div>
         <p id="analysis-detail-note" class="text-xs text-[#6E6E73] dark:text-[#9CA3AF] italic">Isı haritasındaki herhangi bir güne tıklayarak detayları görüntüleyebilirsiniz.</p>
         <div id="analysis-detail-photo-wrap" class="hidden pt-1">
-          <img id="analysis-detail-photo" src="" alt="Gün Fotoğrafı" class="w-full max-h-56 object-cover rounded-xl border border-black/[0.05] dark:border-white/[0.08]">
+          <img id="analysis-detail-photo" src="" alt="Gün Fotoğrafı" class="w-full max-h-44 object-cover rounded-xl border border-black/[0.05] dark:border-white/[0.08]">
         </div>
       </div>
 
@@ -472,7 +477,7 @@
 
   </main>
 
-  <!-- BOTTOM NAVIGATION BAR (5 Tabs: Ana Sayfa - Alışkanlıklar - Hedefler - Etkinlikler - Analiz) -->
+  <!-- BOTTOM NAVIGATION BAR (5 Tabs: Ana Sayfa - Alışkanlık - Hedefler - Etkinlikler - Analiz) -->
   <nav class="bottom-nav-fix fixed bottom-0 left-0 right-0 w-full z-40 bg-[#141824] text-white rounded-t-2xl shadow-2xl border-t border-white/10 pt-2.5 px-1">
     <div class="grid grid-cols-5 items-center max-w-md mx-auto">
       <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-tab-btn flex flex-col items-center justify-center gap-1 py-1.5 text-white transition-opacity">
@@ -615,7 +620,7 @@
     </div>
   </div>
 
-  <!-- Add / Edit Habit Modal (With Daily Target Count) -->
+  <!-- Add / Edit Habit Modal -->
   <div id="modal-habit" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
     <div class="bg-white dark:bg-[#161923] w-full max-w-md rounded-t-2xl sm:rounded-2xl p-5 space-y-4">
       <div class="flex items-center justify-between border-b border-black/[0.06] dark:border-white/[0.08] pb-3">
@@ -680,9 +685,7 @@
         </div>
         <div>
           <label class="block text-[#8E8E93] mb-1">Alt Aşamalar (Her satıra bir adet)</label>
-          <textarea id="input-goal-milestones" rows="3" placeholder="Kelime ezberle
-Grammar tekrar et
-Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[#1D1D1F] dark:text-[#F3F4F6] border border-black/[0.04] dark:border-white/[0.08] focus:outline-none focus:ring-1 focus:ring-[#141824] resize-none"></textarea>
+          <textarea id="input-goal-milestones" rows="3" placeholder="Kelime ezberle&#10;Grammar tekrar et&#10;Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[#1D1D1F] dark:text-[#F3F4F6] border border-black/[0.04] dark:border-white/[0.08] focus:outline-none focus:ring-1 focus:ring-[#141824] resize-none"></textarea>
         </div>
       </div>
 
@@ -835,10 +838,10 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
         { id: 't3', title: 'Günlük Rapor Hazırla', points: 25, time: '17:00', completed: false }
       ],
       habits: [
-        { id: 'h1', title: 'Su İçme (2.5L)', theme: 'navy', time: '10:00', dailyTarget: 3, checkIns: {} },
-        { id: 'h2', title: 'Kitap Okuma', theme: 'emerald', time: '21:30', dailyTarget: 1, checkIns: {} },
-        { id: 'h3', title: 'Egzersiz / Spor', theme: 'amber', time: '', dailyTarget: 1, checkIns: {} },
-        { id: 'h4', title: 'Yazılım Çalışma', theme: 'orange', time: '', dailyTarget: 1, checkIns: {} }
+        { id: 'h1', title: 'Su İçme (2.5L)', theme: 'navy', time: '10:00', dailyTarget: 3, checkIns: {}, targetByDate: {} },
+        { id: 'h2', title: 'Kitap Okuma', theme: 'emerald', time: '21:30', dailyTarget: 1, checkIns: {}, targetByDate: {} },
+        { id: 'h3', title: 'Egzersiz / Spor', theme: 'amber', time: '', dailyTarget: 1, checkIns: {}, targetByDate: {} },
+        { id: 'h4', title: 'Yazılım Çalışma', theme: 'orange', time: '', dailyTarget: 1, checkIns: {}, targetByDate: {} }
       ],
       goals: [
         {
@@ -856,22 +859,30 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
       evaluations: {}
     };
 
-    // Multi-count Habit Helpers (Backwards compatible with boolean true)
+    // Multi-count Habit Helpers (Preserves historical dailyTarget per date)
     function getHabitTarget(h) {
       const t = parseInt(h.dailyTarget);
       return (t && t > 1) ? t : 1;
     }
 
+    function getHabitTargetForDate(h, dateStr) {
+      if (h.targetByDate && h.targetByDate[dateStr]) {
+        const saved = parseInt(h.targetByDate[dateStr]);
+        if (saved && saved >= 1) return saved;
+      }
+      return getHabitTarget(h);
+    }
+
     function getHabitCount(h, dateStr) {
       if (!h.checkIns || !h.checkIns[dateStr]) return 0;
       const val = h.checkIns[dateStr];
-      if (val === true) return getHabitTarget(h);
+      if (val === true) return getHabitTargetForDate(h, dateStr);
       if (typeof val === 'number') return Math.max(0, val);
       return 0;
     }
 
     function isHabitDone(h, dateStr) {
-      return getHabitCount(h, dateStr) >= getHabitTarget(h);
+      return getHabitCount(h, dateStr) >= getHabitTargetForDate(h, dateStr);
     }
 
     function formatLocalDate(d) {
@@ -1137,7 +1148,7 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
     function registerServiceWorker() {
       if ('serviceWorker' in navigator) {
         const swCode = `
-          const CACHE_NAME = 'gunluk-takip-v10';
+          const CACHE_NAME = 'gunluk-takip-v11';
           self.addEventListener('install', e => {
             e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(['./index.html'])));
             self.skipWaiting();
@@ -1213,7 +1224,7 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
       let habitDonePts = 0;
 
       habits.forEach(h => {
-        const target = getHabitTarget(h);
+        const target = getHabitTargetForDate(h, dateStr);
         const count = Math.min(getHabitCount(h, dateStr), target);
         if (count >= target) habitDoneCount++;
         habitDonePts += Math.round(10 * (count / target));
@@ -1371,9 +1382,8 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
         return;
       }
 
-      // 1. Habits for activeDate (Supports single & multi-count)
       habits.forEach(h => {
-        const target = getHabitTarget(h);
+        const target = getHabitTargetForDate(h, activeDate);
         const count = getHabitCount(h, activeDate);
         const isDone = count >= target;
         const item = document.createElement('div');
@@ -1413,7 +1423,6 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
         container.appendChild(item);
       });
 
-      // 2. Manual Tasks (Today only)
       tasks.forEach(t => {
         const item = document.createElement('div');
         item.className = `flex items-center justify-between p-3 rounded-xl bg-white dark:bg-[#161923] border border-black/[0.04] dark:border-white/[0.06] transition-all ${t.completed ? 'opacity-60' : ''}`;
@@ -1622,7 +1631,6 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
       showToast('Etkinlik takvime aktarıldı');
     }
 
-    // Habit Calendar Modal Logic
     function openHabitCalendarModal(id) {
       const h = appState.habits.find(item => item.id === id);
       if (!h) return;
@@ -1839,22 +1847,30 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
     }
 
     // -------------------------------------------------------------
-    // HABITS TAB
+    // HABITS TAB & HIGH-CONTRAST HEATMAP COLORS
     // -------------------------------------------------------------
     const HABIT_DOT_COLORS = {
-      navy: 'bg-[#141824] dark:bg-[#60A5FA]',
-      emerald: 'bg-[#10B981]',
-      amber: 'bg-[#F59E0B]',
-      orange: 'bg-[#F25C19]',
-      pink: 'bg-[#EC4899]'
+      navy: 'bg-[#1D4ED8] dark:bg-[#3B82F6]',
+      emerald: 'bg-[#059669] dark:bg-[#10B981]',
+      amber: 'bg-[#D97706] dark:bg-[#F59E0B]',
+      orange: 'bg-[#EA580C] dark:bg-[#F25C19]',
+      pink: 'bg-[#DB2777] dark:bg-[#EC4899]'
     };
 
-    const HABIT_HEAT_COLORS = {
-      navy: 'bg-[#141824] dark:bg-[#60A5FA]',
-      emerald: 'bg-[#10B981]',
-      amber: 'bg-[#F59E0B]',
-      orange: 'bg-[#F25C19]',
-      pink: 'bg-[#EC4899]'
+    const HABIT_HEAT_FULL = {
+      navy: 'bg-[#1D4ED8] dark:bg-[#3B82F6]',
+      emerald: 'bg-[#059669] dark:bg-[#10B981]',
+      amber: 'bg-[#D97706] dark:bg-[#F59E0B]',
+      orange: 'bg-[#EA580C] dark:bg-[#F25C19]',
+      pink: 'bg-[#DB2777] dark:bg-[#EC4899]'
+    };
+
+    const HABIT_HEAT_PARTIAL = {
+      navy: 'bg-[#BFDBFE] dark:bg-[#1E3A8A] border border-[#60A5FA]/70',
+      emerald: 'bg-[#A7F3D0] dark:bg-[#064E3B] border border-[#34D399]/70',
+      amber: 'bg-[#FDE68A] dark:bg-[#78350F] border border-[#FBBF24]/70',
+      orange: 'bg-[#FED7AA] dark:bg-[#7C2D12] border border-[#FB923C]/70',
+      pink: 'bg-[#FBCFE8] dark:bg-[#831843] border border-[#F472B6]/70'
     };
 
     function renderHabits() {
@@ -1991,15 +2007,22 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
       const habit = appState.habits.find(h => h.id === id);
       if (habit) {
         if (!habit.checkIns) habit.checkIns = {};
-        const target = getHabitTarget(habit);
+        if (!habit.targetByDate) habit.targetByDate = {};
+        const target = getHabitTargetForDate(habit, activeDate);
         const current = getHabitCount(habit, activeDate);
 
         if (target === 1) {
           if (current >= 1) delete habit.checkIns[activeDate];
-          else habit.checkIns[activeDate] = 1;
+          else {
+            habit.checkIns[activeDate] = 1;
+            habit.targetByDate[activeDate] = target;
+          }
         } else {
           if (current >= target) delete habit.checkIns[activeDate];
-          else habit.checkIns[activeDate] = current + 1;
+          else {
+            habit.checkIns[activeDate] = current + 1;
+            habit.targetByDate[activeDate] = target;
+          }
         }
 
         if (appState.evaluations[activeDate]) {
@@ -2036,7 +2059,7 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
     }
 
     // -------------------------------------------------------------
-    // EVENTS TAB (Live Countdown: Gün / Saat / Dakika)
+    // EVENTS TAB
     // -------------------------------------------------------------
     function getEventCountdown(dateStr, timeStr) {
       if (!dateStr) return { text: 'Tarih yok', passed: false, diffMs: Infinity };
@@ -2296,20 +2319,20 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
           }
         }
 
-        let intensityClass = 'bg-[#E5E5EA]/50 dark:bg-[#232838]';
+        let intensityClass = 'bg-[#E5E5EA]/60 dark:bg-[#232838]';
         if (val !== null && val > 0) {
           if (colorType === 'orange') {
-            if (val >= 75) intensityClass = 'bg-[#F25C19]';
-            else if (val >= 45) intensityClass = 'bg-[#FF9500]';
-            else intensityClass = 'bg-[#FFCC00]';
+            if (val >= 80) intensityClass = 'bg-[#EA580C] dark:bg-[#F25C19]';
+            else if (val >= 45) intensityClass = 'bg-[#FB923C] dark:bg-[#C2410C]';
+            else intensityClass = 'bg-[#FED7AA] dark:bg-[#7C2D12]';
           } else if (colorType === 'indigo') {
-            if (val >= 80) intensityClass = 'bg-[#5E5CE6]';
-            else if (val >= 50) intensityClass = 'bg-[#7D7AFF]';
-            else intensityClass = 'bg-[#B0B0FF]';
+            if (val >= 80) intensityClass = 'bg-[#4F46E5] dark:bg-[#6366F1]';
+            else if (val >= 50) intensityClass = 'bg-[#818CF8] dark:bg-[#4338CA]';
+            else intensityClass = 'bg-[#C7D2FE] dark:bg-[#312E81]';
           } else {
-            if (val >= 75) intensityClass = 'bg-[#34C759]';
-            else if (val >= 45) intensityClass = 'bg-[#30B0C7]';
-            else intensityClass = 'bg-[#A3D5FF]';
+            if (val >= 80) intensityClass = 'bg-[#059669] dark:bg-[#10B981]';
+            else if (val >= 45) intensityClass = 'bg-[#34D399] dark:bg-[#047857]';
+            else intensityClass = 'bg-[#A7F3D0] dark:bg-[#064E3B]';
           }
         }
 
@@ -2342,9 +2365,9 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
       const { containerClass, cellSizeClass } = getHeatmapLayout(dates.length);
 
       habits.forEach(h => {
-        const target = getHabitTarget(h);
         const doneInRange = dates.filter(d => isHabitDone(h, d)).length;
-        const fillColor = HABIT_HEAT_COLORS[h.theme] || HABIT_HEAT_COLORS.navy;
+        const fullColor = HABIT_HEAT_FULL[h.theme] || HABIT_HEAT_FULL.navy;
+        const partialColor = HABIT_HEAT_PARTIAL[h.theme] || HABIT_HEAT_PARTIAL.navy;
         const dotColor = HABIT_DOT_COLORS[h.theme] || HABIT_DOT_COLORS.navy;
 
         const card = document.createElement('div');
@@ -2364,10 +2387,11 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
         grid.className = containerClass;
 
         dates.forEach(dStr => {
+          const targetForDay = getHabitTargetForDate(h, dStr);
           const count = getHabitCount(h, dStr);
-          let bgClass = 'bg-[#E5E5EA]/50 dark:bg-[#232838]';
-          if (count >= target) bgClass = fillColor;
-          else if (count > 0) bgClass = `${fillColor} opacity-45`;
+          let bgClass = 'bg-[#E5E5EA]/60 dark:bg-[#232838]';
+          if (count >= targetForDay) bgClass = fullColor;
+          else if (count > 0) bgClass = partialColor;
 
           const isSelected = selectedAnalysisDate === dStr;
           const selectedClass = isSelected
@@ -2578,6 +2602,16 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
       if (editingHabitId) {
         const h = appState.habits.find(item => item.id === editingHabitId);
         if (h) {
+          const oldTarget = getHabitTarget(h);
+          if (dailyTarget !== oldTarget) {
+            if (!h.targetByDate) h.targetByDate = {};
+            const todayStr = getTodayStr();
+            Object.keys(h.checkIns || {}).forEach(dStr => {
+              if (dStr < todayStr && !h.targetByDate[dStr]) {
+                h.targetByDate[dStr] = oldTarget;
+              }
+            });
+          }
           h.title = title;
           h.dailyTarget = dailyTarget;
           h.theme = theme;
@@ -2594,7 +2628,8 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
           dailyTarget,
           theme,
           time,
-          checkIns: {}
+          checkIns: {},
+          targetByDate: {}
         });
         closeModal('modal-habit');
         saveState();
@@ -2888,7 +2923,7 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
     }
 
     function escapeHtml(str) {
-      return String(str).replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>').replace(/"/g, '"');
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
     function renderApp() {
@@ -2907,3 +2942,4 @@ Pratik yap" class="w-full p-2.5 rounded-xl bg-[#F5F5F7] dark:bg-[#1C202E] text-[
   </script>
 </body>
 </html>
+
