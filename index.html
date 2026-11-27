@@ -1,8 +1,3 @@
-Üç sorunu da düzelttim, uygulamanın geri kalanını birebir korudum:
- * Isı Haritası Renk Ayrımı: Tamamlanan günler doygun tam renkte, yarım kalan günler ise çok daha açık pastel tonda (belirgin kontrastla) görünecek şekilde ayrıştırıldı. Görev, Moral ve Birleşik Skor haritalarındaki düşük/orta/yüksek renk farkları da netleştirildi.
- * Sabit (Sticky) Tarih ve Detay Kartı: Analiz sekmesindeki seçili gün kartı ekranın üstüne sabitlendi (sticky). Aşağıdaki alışkanlık ısı haritalarına kaydırıp herhangi bir güne dokunduğunda tarih ve detaylar hemen gözünün önünde kalır; yukarı çıkmana gerek kalmaz.
- * Eski Günlerin İlerlemesi Korundu: Bir alışkanlığın "Günde Kaç Kez" sayısını sonradan 2–3–4 yaptığında, bugünden önceki tüm kayıtlı günler o günkü eski hedefine kilitlenir (targetByDate). Böylece geçmiş günlerin tamamlanma durumu ve ısı haritası rengi bozulmaz, yalnızca bugünden itibaren yeni hedef geçerli olur.
-Aşağıdaki kodu kopyalayıp GitHub'daki index.html dosyanın üzerine yapıştırabilirsin:
 <!DOCTYPE html>
 <html lang="tr" class="h-full">
 <head>
